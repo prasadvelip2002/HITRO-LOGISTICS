@@ -17,7 +17,7 @@ namespace api_backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.17")
+                .HasAnnotation("ProductVersion", "8.0.29")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -70,11 +70,20 @@ namespace api_backend.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("text");
 
+                    b.Property<string>("City")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
                     b.Property<string>("ContactPerson")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("CreditLimit")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Email")
                         .HasColumnType("text");
@@ -86,7 +95,22 @@ namespace api_backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("PAN")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentTerms")
+                        .HasColumnType("text");
+
                     b.Property<string>("Phone")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RateContract")
+                        .HasColumnType("text");
+
+                    b.Property<string>("State")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
                         .HasColumnType("text");
 
                     b.Property<int>("TenantId")
@@ -146,7 +170,19 @@ namespace api_backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Aadhaar")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CurrentStatus")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ExperienceYears")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("LicenseExpiry")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LicenseNumber")
@@ -459,8 +495,29 @@ namespace api_backend.Migrations
                     b.Property<decimal>("Capacity")
                         .HasColumnType("numeric");
 
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("FitnessExpiry")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("InsuranceExpiry")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OwnerName")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PermitExpiry")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RCNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("text");
 
                     b.Property<int>("TenantId")
                         .HasColumnType("integer");
@@ -492,11 +549,26 @@ namespace api_backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .HasColumnType("text");
+
                     b.Property<string>("BankDetails")
+                        .HasColumnType("text");
+
+                    b.Property<string>("City")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContactPerson")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
 
                     b.Property<string>("GSTIN")
                         .HasColumnType("text");
@@ -512,6 +584,12 @@ namespace api_backend.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("RouteRemarks")
+                        .HasColumnType("text");
+
+                    b.Property<string>("State")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
                         .HasColumnType("text");
 
                     b.Property<string>("TDSInfo")

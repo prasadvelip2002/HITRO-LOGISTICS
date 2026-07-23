@@ -7,12 +7,19 @@ namespace api_backend.Models
     {
         public int Id { get; set; }
         public required string Name { get; set; }
+        public string? ContactPerson { get; set; }
+        public string? Email { get; set; }
+        public string? Address { get; set; }
+        public string? City { get; set; }
+        public string? State { get; set; }
         public string? PAN { get; set; }
         public string? GSTIN { get; set; }
         public string? BankDetails { get; set; }
         public string? TDSInfo { get; set; }
         public string? Phone { get; set; }
         public string? RouteRemarks { get; set; }
+        public string? Code { get; set; } // e.g. VEND-001
+        public string? Status { get; set; } // e.g. Active, Blacklisted
 
         public int TenantId { get; set; }
         public Tenant? Tenant { get; set; }

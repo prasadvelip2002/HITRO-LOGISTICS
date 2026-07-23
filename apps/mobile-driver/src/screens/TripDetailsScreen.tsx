@@ -1,243 +1,316 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, SafeAreaView } from 'react-native';
+import { addToSyncQueue, updateCachedTripStatus } from '../lib/database';
+import NetInfo from '@react-native-community/netinfo';
 
-const API_URL = 'http://10.0.2.2:5246/api';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:5063/api';
 
 export default function TripDetailsScreen({ trip, authState, onBack }: { trip: any, authState: any, onBack: () => void }) {
   const [loading, setLoading] = useState(false);
-  const [podUrl, setPodUrl] = useState(trip.podImageUrl || '');
-  const [chargeAmount, setChargeAmount] = useState('');
-  const [chargeReason, setChargeReason] = useState('');
 
   const updateStatus = async (newStatus: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/Trips/${trip.id}/status`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authState.token}` 
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (response.ok) {
-        Alert.alert('Success', `Trip status updated to ${newStatus}`);
-        onBack();
+      const netInfo = await NetInfo.fetch();
+      const isOnline = netInfo.isConnected && netInfo.isInternetReachable !== false;
+
+      if (isOnline) {
+        const response = await fetch(`${API_URL}/Trips/${trip.id}/status`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authState.token}` 
+          },
+          body: JSON.stringify({ status: newStatus }),
+        });
+        if (response.ok) {
+          await updateCachedTripStatus(trip.id, newStatus);
+          Alert.alert('Success', `Trip status updated to ${newStatus}`);
+          onBack();
+        } else {
+          // API error
+          throw new Error('API failed');
+        }
       } else {
-        Alert.alert('Error', 'Failed to update status');
+        throw new Error('Offline');
       }
     } catch (error) {
-      Alert.alert('Error', 'Network error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const submitPod = async () => {
-    if (!podUrl) {
-      Alert.alert('Error', 'Please provide a POD Image URL or Base64 string');
-      return;
-    }
-    
-    // Simulating POD upload by updating the trip via a hypothetical endpoint or directly
-    // Since backend might not have a specific POD endpoint, we can use the trip update if it exists,
-    // or just show an alert that it's submitted for this prototype.
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      Alert.alert('Success', 'POD Uploaded Successfully!');
+      // Fallback for offline or API down
+      console.log('Falling back to offline sync queue', error);
+      await addToSyncQueue(`/Trips/${trip.id}/status`, 'PUT', { status: newStatus });
+      await updateCachedTripStatus(trip.id, newStatus);
+      Alert.alert('Saved Offline', `Your status update to "${newStatus}" has been saved locally and will sync when you are online.`);
       onBack();
-    }, 1000);
-  };
-
-  const submitAdditionalCharge = async () => {
-    if (!chargeAmount || !chargeReason) {
-      Alert.alert('Error', 'Please provide amount and reason');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/AdditionalCharges`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authState.token}` 
-        },
-        body: JSON.stringify({
-          tripId: trip.id,
-          amount: parseFloat(chargeAmount),
-          reason: chargeReason,
-          status: 'Pending'
-        }),
-      });
-      if (response.ok) {
-        Alert.alert('Success', 'Additional charge requested!');
-        setChargeAmount('');
-        setChargeReason('');
-      } else {
-        Alert.alert('Error', 'Failed to submit charge');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Network error');
     } finally {
       setLoading(false);
     }
   };
+
+  const source = trip.indent?.source || 'Mumbai';
+  const dest = trip.indent?.destination || 'Pune';
+  const material = trip.indent?.material || 'Auto parts';
+  const weight = trip.indent?.weight || 2.5;
+  const earnings = trip.freightCharges || 12500;
 
   return (
-    <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={onBack}>
-        <Text style={styles.backText}>← Back to Trips</Text>
-      </TouchableOpacity>
-
-      <View style={styles.card}>
-        <Text style={styles.title}>Trip #{trip.id}</Text>
-        <Text style={styles.status}>Status: {trip.status}</Text>
-        <Text style={styles.text}>Booking Type: {trip.bookingType}</Text>
-        <Text style={styles.text}>Freight: ₹{trip.freightCharges}</Text>
-        <Text style={styles.text}>Advance: ₹{trip.advanceAmount}</Text>
-        <Text style={styles.text}>Balance: ₹{trip.balanceAmount}</Text>
-        <Text style={styles.text}>Start KM: {trip.startingKM || 'N/A'}</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <Text style={styles.backIcon}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Trip Details</Text>
+        <View style={{ width: 24 }} />
       </View>
 
-      <View style={styles.actionsContainer}>
-        <Text style={styles.sectionTitle}>Update Status</Text>
-        <View style={styles.buttonsRow}>
-          {trip.status === 'Assigned' && (
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#3b82f6' }]} onPress={() => updateStatus('InTransit')} disabled={loading}>
-              <Text style={styles.actionText}>Start Trip</Text>
-            </TouchableOpacity>
-          )}
-          {trip.status === 'InTransit' && (
-            <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#22c55e' }]} onPress={() => updateStatus('Delivered')} disabled={loading}>
-              <Text style={styles.actionText}>Mark Delivered</Text>
-            </TouchableOpacity>
-          )}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Map Placeholder */}
+        <View style={styles.mapPlaceholder}>
+          <Text style={styles.mapText}>🗺️ Map View</Text>
         </View>
+
+        <View style={styles.detailsCard}>
+          <View style={styles.routeHeader}>
+            <Text style={styles.tripId}>TRIP-{trip.id}</Text>
+            <View style={styles.badgeNew}>
+              <Text style={styles.badgeNewText}>New Assignment</Text>
+            </View>
+          </View>
+
+          <View style={styles.locations}>
+            <View style={styles.locationItem}>
+              <View style={styles.dotBlue} />
+              <View>
+                <Text style={styles.locationLabel}>Pickup</Text>
+                <Text style={styles.locationValue}>{source}</Text>
+              </View>
+            </View>
+            <View style={styles.line} />
+            <View style={styles.locationItem}>
+              <View style={styles.dotOrange} />
+              <View>
+                <Text style={styles.locationLabel}>Dropoff</Text>
+                <Text style={styles.locationValue}>{dest}</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Cargo</Text>
+            <Text style={styles.infoValue}>{material} ({weight} Tons)</Text>
+          </View>
+          
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Date</Text>
+            <Text style={styles.infoValue}>07 Jul, 09:00 AM</Text>
+          </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.infoRow}>
+            <Text style={styles.earningsLabel}>Expected Earnings</Text>
+            <Text style={styles.earningsValue}>₹{earnings.toLocaleString()}</Text>
+          </View>
+        </View>
+      </ScrollView>
+
+      <View style={styles.bottomBar}>
+        <TouchableOpacity style={styles.rejectBtn} onPress={onBack}>
+          <Text style={styles.rejectBtnText}>Reject</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.acceptBtn} onPress={() => updateStatus('Accepted')} disabled={loading}>
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.acceptBtnText}>Accept Trip</Text>}
+        </TouchableOpacity>
       </View>
-
-      {trip.status === 'Delivered' && (
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Upload Proof of Delivery (POD)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Image URL or Base64"
-            value={podUrl}
-            onChangeText={setPodUrl}
-          />
-          <TouchableOpacity style={styles.button} onPress={submitPod} disabled={loading}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Submit POD</Text>}
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {(trip.status === 'InTransit' || trip.status === 'Delivered') && (
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Request Additional Charge</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Amount (₹)"
-            value={chargeAmount}
-            onChangeText={setChargeAmount}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={[styles.input, { height: 80 }]}
-            placeholder="Reason (e.g., Tolls, Halting)"
-            value={chargeReason}
-            onChangeText={setChargeReason}
-            multiline
-          />
-          <TouchableOpacity style={styles.button} onPress={submitAdditionalCharge} disabled={loading}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Submit Request</Text>}
-          </TouchableOpacity>
-        </View>
-      )}
-
-    </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-    padding: 15,
+    backgroundColor: '#f8fafc',
   },
-  backButton: {
-    marginTop: 40,
-    marginBottom: 20,
-  },
-  backText: {
-    color: '#0066cc',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  card: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 8,
-    marginBottom: 20,
-    borderWidth: 1,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
     borderColor: '#e2e8f0',
   },
-  title: {
+  backButton: {
+    padding: 5,
+  },
+  backIcon: {
     fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    color: '#0f172a',
   },
-  status: {
+  headerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#3b82f6',
-    marginBottom: 15,
+    fontWeight: '700',
+    color: '#0f172a',
   },
-  text: {
-    fontSize: 16,
-    marginBottom: 8,
+  scrollContent: {
+    paddingBottom: 100,
+  },
+  mapPlaceholder: {
+    height: 200,
+    backgroundColor: '#cbd5e1',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mapText: {
+    fontSize: 24,
     color: '#475569',
+    fontWeight: '600',
   },
-  actionsContainer: {
+  detailsCard: {
+    backgroundColor: '#ffffff',
+    margin: 16,
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+    marginTop: -30, // Overlap the map
+  },
+  routeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 20,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
+  tripId: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0f172a',
   },
-  buttonsRow: {
+  badgeNew: {
+    backgroundColor: '#fef3c7',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  badgeNewText: {
+    color: '#d97706',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  locations: {
+    marginBottom: 10,
+  },
+  locationItem: {
     flexDirection: 'row',
-    gap: 10,
+    alignItems: 'flex-start',
   },
-  actionButton: {
+  dotBlue: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#3b82f6',
+    marginTop: 4,
+    marginRight: 12,
+  },
+  dotOrange: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#f97316',
+    marginTop: 4,
+    marginRight: 12,
+  },
+  line: {
+    width: 2,
+    height: 20,
+    backgroundColor: '#e2e8f0',
+    marginLeft: 5,
+    marginVertical: 4,
+  },
+  locationLabel: {
+    fontSize: 12,
+    color: '#64748b',
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  locationValue: {
+    fontSize: 16,
+    color: '#0f172a',
+    fontWeight: '700',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#e2e8f0',
+    marginVertical: 16,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  infoLabel: {
+    fontSize: 14,
+    color: '#64748b',
+    fontWeight: '500',
+  },
+  infoValue: {
+    fontSize: 14,
+    color: '#0f172a',
+    fontWeight: '600',
+  },
+  earningsLabel: {
+    fontSize: 16,
+    color: '#0f172a',
+    fontWeight: '700',
+  },
+  earningsValue: {
+    fontSize: 18,
+    color: '#22c55e',
+    fontWeight: '800',
+  },
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#ffffff',
+    flexDirection: 'row',
+    padding: 16,
+    borderTopWidth: 1,
+    borderColor: '#e2e8f0',
+    gap: 12,
+  },
+  rejectBtn: {
     flex: 1,
-    padding: 15,
-    borderRadius: 8,
+    paddingVertical: 16,
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+    borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  actionText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  rejectBtnText: {
+    color: '#475569',
     fontSize: 16,
+    fontWeight: '700',
   },
-  input: {
-    backgroundColor: '#f8fafc',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  button: {
-    backgroundColor: '#0066cc',
-    padding: 15,
-    borderRadius: 8,
+  acceptBtn: {
+    flex: 2,
+    paddingVertical: 16,
+    backgroundColor: '#1d4ed8',
+    borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  buttonText: {
-    color: '#fff',
+  acceptBtnText: {
+    color: '#ffffff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
 });

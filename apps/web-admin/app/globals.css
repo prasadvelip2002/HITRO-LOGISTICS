@@ -46,15 +46,15 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 
   /* Prototype Colors */
-  --color-ink: #16233F;
-  --color-ink-soft: #2A3B5C;
+  --color-ink: #0f172a;
+  --color-ink-soft: #1e293b;
   --color-canvas: #F3F5F9;
   --color-panel: #FFFFFF;
   --color-line: #E1E6EF;
   --color-route: #2D7DD2;
   --color-route-soft: #EAF1FB;
-  --color-signal: #FF6B35;
-  --color-signal-soft: #FFE8DC;
+  --color-signal: #f97316;
+  --color-signal-soft: #ffedd5;
   --color-depot: #1F9D55;
   --color-depot-soft: #E6F7ED;
   --color-alert: #D64545;

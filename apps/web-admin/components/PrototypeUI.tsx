@@ -126,6 +126,6 @@ export function ProtoTable({ headers, children }: { headers: React.ReactNode[], 
   );
 }
 
-export function Td({ children, className = "" }: { children: React.ReactNode, className?: string }) {
-  return <td className={`px-[18px] py-[11px] ${className}`}>{children}</td>;
+export function Td({ children, className = "", title }: { children: React.ReactNode, className?: string, title?: string }) {
+  return <td className={`px-[18px] py-[11px] ${className}`} title={title}>{children}</td>;
 }
