@@ -11,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add HttpContextAccessor for DbContext
 builder.Services.AddHttpContextAccessor();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

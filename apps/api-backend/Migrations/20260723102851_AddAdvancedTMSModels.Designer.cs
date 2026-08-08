@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using api_backend.Data;
@@ -11,9 +12,11 @@ using api_backend.Data;
 namespace api_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260723102851_AddAdvancedTMSModels")]
+    partial class AddAdvancedTMSModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,34 +60,6 @@ namespace api_backend.Migrations
                     b.HasIndex("TripId");
 
                     b.ToTable("AdditionalCharges");
-                });
-
-            modelBuilder.Entity("api_backend.Models.Branch", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Location")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("TenantId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.ToTable("Branches");
                 });
 
             modelBuilder.Entity("api_backend.Models.Customer", b =>
@@ -287,9 +262,6 @@ namespace api_backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BranchId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -340,8 +312,6 @@ namespace api_backend.Migrations
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BranchId");
 
                     b.HasIndex("CustomerId");
 
@@ -456,9 +426,6 @@ namespace api_backend.Migrations
                     b.Property<int>("IndentId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("IsPreferred")
-                        .HasColumnType("boolean");
-
                     b.Property<decimal>("QuotedRate")
                         .HasColumnType("numeric");
 
@@ -524,9 +491,6 @@ namespace api_backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("BranchId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -554,20 +518,8 @@ namespace api_backend.Migrations
                     b.Property<int>("IndentId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("LRGenerationType")
-                        .HasColumnType("text");
-
                     b.Property<string>("LRNumber")
                         .HasColumnType("text");
-
-                    b.Property<string>("ManualLRNumber")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("PODReceivedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("PODUploadedDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("RatePerTon")
                         .HasColumnType("numeric");
@@ -610,8 +562,6 @@ namespace api_backend.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BranchId");
 
                     b.HasIndex("DriverId");
 
@@ -676,9 +626,6 @@ namespace api_backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BranchId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -702,8 +649,6 @@ namespace api_backend.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BranchId");
 
                     b.HasIndex("TenantId");
 
@@ -883,17 +828,6 @@ namespace api_backend.Migrations
                     b.Navigation("Trip");
                 });
 
-            modelBuilder.Entity("api_backend.Models.Branch", b =>
-                {
-                    b.HasOne("api_backend.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
             modelBuilder.Entity("api_backend.Models.Customer", b =>
                 {
                     b.HasOne("api_backend.Models.Tenant", "Tenant")
@@ -948,10 +882,6 @@ namespace api_backend.Migrations
 
             modelBuilder.Entity("api_backend.Models.Indent", b =>
                 {
-                    b.HasOne("api_backend.Models.Branch", "Branch")
-                        .WithMany()
-                        .HasForeignKey("BranchId");
-
                     b.HasOne("api_backend.Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
@@ -963,8 +893,6 @@ namespace api_backend.Migrations
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Branch");
 
                     b.Navigation("Customer");
 
@@ -1036,10 +964,6 @@ namespace api_backend.Migrations
 
             modelBuilder.Entity("api_backend.Models.Trip", b =>
                 {
-                    b.HasOne("api_backend.Models.Branch", "Branch")
-                        .WithMany()
-                        .HasForeignKey("BranchId");
-
                     b.HasOne("api_backend.Models.Driver", "Driver")
                         .WithMany("Trips")
                         .HasForeignKey("DriverId")
@@ -1069,8 +993,6 @@ namespace api_backend.Migrations
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Branch");
 
                     b.Navigation("Driver");
 
@@ -1104,17 +1026,11 @@ namespace api_backend.Migrations
 
             modelBuilder.Entity("api_backend.Models.User", b =>
                 {
-                    b.HasOne("api_backend.Models.Branch", "Branch")
-                        .WithMany()
-                        .HasForeignKey("BranchId");
-
                     b.HasOne("api_backend.Models.Tenant", "Tenant")
                         .WithMany("Users")
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Branch");
 
                     b.Navigation("Tenant");
                 });

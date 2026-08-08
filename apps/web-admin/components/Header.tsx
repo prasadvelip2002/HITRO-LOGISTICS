@@ -25,31 +25,27 @@ export function Header() {
   };
 
   return (
-    <div className="h-[70px] shrink-0 bg-panel border-b border-line flex items-center justify-between px-6 relative z-50">
-      <div className="crumb font-disp">
-        <div className="font-semibold text-[20px] text-ink leading-tight">Dashboard</div>
-        <div className="font-body font-normal text-[13px] text-muted-text mt-[2px]">Overview across all active trips</div>
+    <div className="h-[100px] shrink-0 bg-white border-b border-slate-200/80 flex items-center justify-between px-8 relative z-50">
+      <div className="flex flex-col">
+        <div className="font-bold text-[18px] text-slate-800 leading-tight">Dashboard</div>
+        <div className="font-medium text-[12.5px] text-slate-500 mt-0.5 tracking-wide">Overview across all active trips</div>
       </div>
-      <div className="flex items-center gap-4">
-        <div className="font-mono text-[11px] font-medium bg-route-soft text-route px-[12px] py-[6px] rounded-[20px] hidden sm:block">
-          TENANT: SHREE FREIGHT CARRIERS
-        </div>
-        
-        <button className="flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-slate-100 text-muted-text hover:text-ink transition-colors relative">
-          <Bell size={18} />
-          <span className="absolute top-[8px] right-[8px] w-[8px] h-[8px] bg-alert rounded-full border-2 border-panel"></span>
+      <div className="flex items-center gap-6">
+        <button className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-50 text-slate-400 hover:text-slate-700 transition-colors relative border border-transparent hover:border-slate-200/60">
+          <Bell size={18} strokeWidth={2.5} />
+          <span className="absolute top-[10px] right-[10px] w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
         </button>
 
         <div className="relative">
           <button 
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 hover:bg-slate-50 p-1 pr-3 rounded-full transition-colors border border-transparent hover:border-line"
+            className="flex items-center gap-3 hover:bg-slate-50 p-1.5 pr-4 rounded-full transition-all duration-200 border border-transparent hover:border-slate-200/80 hover:shadow-sm"
           >
-            <div className="w-[32px] h-[32px] bg-signal text-[#1B1200] rounded-full flex items-center justify-center font-bold text-[13px]">
+            <div className="w-[34px] h-[34px] bg-gradient-to-br from-yellow-400 to-yellow-600 text-white rounded-full flex items-center justify-center font-bold text-[14px] shadow-inner">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
             </div>
             <div className="text-left hidden sm:block">
-              <div className="text-[12.5px] font-bold text-ink leading-none">{user?.name || "Admin"}</div>
+              <div className="text-[13px] font-semibold text-slate-700 leading-none">{user?.name || "Admin"}</div>
             </div>
           </button>
 

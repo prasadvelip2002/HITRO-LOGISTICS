@@ -2,6 +2,13 @@ const API_BASE_URL = 'http://localhost:5063/api';
 
 async function seedData() {
     try {
+        console.log("Setting up tenant and admin...");
+        await fetch(`${API_BASE_URL}/auth/setup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tenantName: 'Aditi Trans', adminEmail: 'admin@example.com', adminPassword: 'password123' })
+        });
+
         console.log("Logging in to get token...");
         const loginRes = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',

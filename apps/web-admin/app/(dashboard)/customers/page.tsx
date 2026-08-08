@@ -129,10 +129,13 @@ export default function CustomersPage() {
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_0.8fr] gap-[18px] items-start">
-      <div className="bg-panel border border-line rounded-[10px] overflow-hidden">
-        <div className="px-[18px] py-[14px] border-b border-line flex items-center justify-between">
-          <h3 className="font-disp text-[14.5px] font-semibold m-0">Customers</h3>
+    <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_0.8fr] gap-6 items-start max-w-[1600px] mx-auto pb-10">
+      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/50 overflow-hidden">
+        <div className="px-6 py-5 border-b border-slate-200/80 flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-[16px] text-slate-900 m-0 tracking-tight">Customers</h3>
+            <p className="text-[12.5px] font-medium text-slate-500 mt-1">Manage client profiles and contracts</p>
+          </div>
         </div>
         <ProtoTable headers={["CODE", "CUSTOMER", "GSTIN", "RATE CONTRACT", "STATUS", "ACTIONS"]}>
           {isLoading ? (
@@ -165,65 +168,70 @@ export default function CustomersPage() {
         </ProtoTable>
       </div>
 
-      <div className="bg-panel border border-line rounded-[10px] overflow-hidden">
-        <div className="px-[18px] py-[14px] border-b border-line flex items-center justify-between">
-          <h3 className="font-disp text-[14.5px] font-semibold m-0">
-            {formData.id > 0 ? "Edit Customer" : "New Customer"}
-          </h3>
+      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/50 overflow-hidden">
+        <div className="px-6 py-5 border-b border-slate-200/80 flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-[16px] text-slate-900 m-0 tracking-tight">
+              {formData.id > 0 ? "Edit Customer" : "New Customer"}
+            </h3>
+            <p className="text-[12.5px] font-medium text-slate-500 mt-1">
+              {formData.id > 0 ? "Update customer details" : "Create a new customer profile"}
+            </p>
+          </div>
           {formData.id > 0 && (
-            <button onClick={() => setFormData(DEFAULT_FORM)} className="text-[12px] text-route hover:underline">
-              Clear
+            <button onClick={() => setFormData(DEFAULT_FORM)} className="text-[12px] font-semibold text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 px-3 py-1.5 rounded-lg transition-colors">
+              Clear Form
             </button>
           )}
         </div>
-        <form onSubmit={handleSubmit} className="p-[16px] grid grid-cols-2 gap-[12px]">
+        <form onSubmit={handleSubmit} className="p-6 grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Customer Name</label>
-            <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. ABC Cement Ltd" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Customer Name</label>
+            <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. ABC Cement Ltd" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Code</label>
-            <input value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. CUST-001" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Code</label>
+            <input value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. CUST-001" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">GSTIN</label>
-            <input required value={formData.gstin} onChange={e => setFormData({...formData, gstin: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="GST number" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">GSTIN</label>
+            <input required value={formData.gstin} onChange={e => setFormData({...formData, gstin: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="GST number" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Rate Contract</label>
-            <input value={formData.rateContract} onChange={e => setFormData({...formData, rateContract: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. Active - FTL" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Rate Contract</label>
+            <input value={formData.rateContract} onChange={e => setFormData({...formData, rateContract: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. Active - FTL" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Status</label>
-            <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal">
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Status</label>
+            <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm">
               <option value="Active">Active</option>
               <option value="Pending KYC">Pending KYC</option>
               <option value="On Hold">On Hold</option>
             </select>
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Phone</label>
-            <input required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="Phone number" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Phone</label>
+            <input required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="Phone number" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">City</label>
-            <input value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. Bangalore" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">City</label>
+            <input value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. Bangalore" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">State</label>
-            <input value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. Karnataka" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">State</label>
+            <input value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. Karnataka" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">PAN Number</label>
-            <input value={formData.pan} onChange={e => setFormData({...formData, pan: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. ABCDE1234F" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">PAN Number</label>
+            <input value={formData.pan} onChange={e => setFormData({...formData, pan: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. ABCDE1234F" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Credit Limit (₹)</label>
-            <input type="number" value={formData.creditLimit} onChange={e => setFormData({...formData, creditLimit: Number(e.target.value)})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. 500000" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Credit Limit (₹)</label>
+            <input type="number" value={formData.creditLimit} onChange={e => setFormData({...formData, creditLimit: Number(e.target.value)})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. 500000" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Payment Terms</label>
-            <select value={formData.paymentTerms} onChange={e => setFormData({...formData, paymentTerms: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal">
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Payment Terms</label>
+            <select value={formData.paymentTerms} onChange={e => setFormData({...formData, paymentTerms: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm">
               <option value="Immediate">Immediate</option>
               <option value="Net 15">Net 15</option>
               <option value="Net 30">Net 30</option>
@@ -232,17 +240,20 @@ export default function CustomersPage() {
             </select>
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Contact Person</label>
-            <input value={formData.contactPerson} onChange={e => setFormData({...formData, contactPerson: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. Ramesh" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Contact Person</label>
+            <input value={formData.contactPerson} onChange={e => setFormData({...formData, contactPerson: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. Ramesh" />
           </div>
           <div className="col-span-2">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Billing Address</label>
-            <textarea value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal h-[52px]" placeholder="Full address" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Billing Address</label>
+            <textarea value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm h-24 resize-none" placeholder="Full address" />
           </div>
-          <div className="col-span-2 mt-2">
-            <ProtoButton variant="dark" style={{ width: '100%' }}>
+          <div className="col-span-2 mt-4">
+            <button 
+              type="submit"
+              className="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold text-[14px] py-3 rounded-xl shadow-sm transition-colors"
+            >
               {isSubmitting ? "Saving..." : (formData.id > 0 ? "Update Customer" : "Save Customer")}
-            </ProtoButton>
+            </button>
           </div>
         </form>
       </div>

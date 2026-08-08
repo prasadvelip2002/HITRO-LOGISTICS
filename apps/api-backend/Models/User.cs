@@ -9,7 +9,10 @@ namespace api_backend.Models
         public required string Email { get; set; }
         public required string PasswordHash { get; set; }
         
-        public required string Role { get; set; } // Internal User, Accounts, Manager, Tenant Admin, Driver
+        public required string Role { get; set; } // Admin, Director/Operations Head, Operations Manager, Branch Supervisor, Finance, Driver
+
+        public int? BranchId { get; set; }
+        public Branch? Branch { get; set; }
         
         public int TenantId { get; set; }
         public Tenant? Tenant { get; set; }

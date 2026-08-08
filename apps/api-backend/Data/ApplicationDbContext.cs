@@ -17,6 +17,7 @@ namespace api_backend.Data
 
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
+        public DbSet<Branch> Branches { get; set; }
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Indent> Indents { get; set; }
@@ -28,6 +29,9 @@ namespace api_backend.Data
         public DbSet<WhatsAppLog> WhatsAppLogs { get; set; }
         public DbSet<Tenant> Tenants { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<SupplierQuotation> SupplierQuotations { get; set; }
+        public DbSet<TripEvent> TripEvents { get; set; }
+        public DbSet<CustomerRateContract> CustomerRateContracts { get; set; }
 
         public int CurrentTenantId 
         { 
@@ -48,6 +52,7 @@ namespace api_backend.Data
 
             modelBuilder.Entity<Customer>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
             modelBuilder.Entity<Vendor>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
+            modelBuilder.Entity<Branch>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
             modelBuilder.Entity<Driver>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
             modelBuilder.Entity<Vehicle>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
             modelBuilder.Entity<Indent>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
@@ -57,6 +62,9 @@ namespace api_backend.Data
             modelBuilder.Entity<Document>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
             modelBuilder.Entity<Notification>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
             modelBuilder.Entity<WhatsAppLog>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
+            modelBuilder.Entity<SupplierQuotation>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
+            modelBuilder.Entity<TripEvent>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
+            modelBuilder.Entity<CustomerRateContract>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -68,7 +76,7 @@ namespace api_backend.Data
                 {
                     // Check if the entity has a TenantId property
                     var property = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "TenantId");
-                    if (property != null && (entry.State == EntityState.Added || (int)property.CurrentValue == 0))
+                    if (property != null && (entry.State == EntityState.Added || property.CurrentValue is int val && val == 0))
                     {
                         property.CurrentValue = tenantId;
                     }

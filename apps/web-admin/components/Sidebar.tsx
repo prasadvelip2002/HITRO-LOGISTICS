@@ -64,19 +64,12 @@ export function Sidebar() {
   ];
 
   return (
-    <div className="w-[216px] shrink-0 bg-ink text-white flex flex-col h-full border-r border-ink-soft">
-      <div className="h-[70px] shrink-0 flex items-center px-[20px] gap-[10px] font-disp font-bold tracking-[0.3px] text-[15px] border-b border-ink-soft mb-2">
-        <div className="w-[22px] h-[22px] rounded-[5px] bg-signal flex items-center justify-center">
-          <svg viewBox="0 0 24 24" fill="none" className="w-[14px] h-[14px]">
-            <path d="M2 16h13V7H2v9Zm13 0h4l3-4v-3h-7v7Z" stroke="#fff" strokeWidth="1.6" strokeLinejoin="round"/>
-            <circle cx="6" cy="18.5" r="1.6" fill="#fff"/>
-            <circle cx="17.5" cy="18.5" r="1.6" fill="#fff"/>
-          </svg>
-        </div>
-        RouteLedger TMS
+    <div className="w-[260px] shrink-0 bg-slate-100 text-slate-600 flex flex-col h-full border-r border-slate-200/80">
+      <div className="h-[100px] shrink-0 flex items-center px-4 justify-center mb-2">
+        <img src="/logo.png" alt="ADITI TRANS" className="w-full h-[75px] object-contain mix-blend-multiply" />
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-4">
+      <div className="flex-1 overflow-y-auto pb-4 scrollbar-hide">
         {navGroups.map((g, i) => {
           const visibleItems = g.items.filter(item => item.roles.includes(userRole));
           
@@ -84,7 +77,7 @@ export function Sidebar() {
 
           return (
             <div key={i}>
-              <div className="font-mono text-[10px] tracking-[1.2px] text-white/35 uppercase px-[20px] pt-[14px] pb-[6px]">
+              <div className="font-sans text-[11px] tracking-wider text-slate-400 font-semibold uppercase px-6 pt-5 pb-2">
                 {g.group}
               </div>
               {visibleItems.map((item, j) => {
@@ -94,13 +87,13 @@ export function Sidebar() {
                   <Link
                     key={j}
                     href={item.href}
-                    className={`flex items-center gap-[10px] px-[12px] py-[9px] mx-[12px] my-[2px] text-[13px] font-medium cursor-pointer rounded-lg transition-colors
+                    className={`flex items-center gap-3 px-3 py-2.5 mx-3 my-1 text-[13.5px] cursor-pointer rounded-md transition-all duration-200
                       ${isActive 
-                        ? 'bg-signal text-white' 
-                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                        ? 'bg-white text-yellow-700 font-semibold shadow-sm ring-1 ring-slate-200/50' 
+                        : 'text-slate-500 hover:bg-slate-100/50 hover:text-slate-900 font-medium'
                       }`}
                   >
-                    <Icon className="w-[15px] h-[15px] shrink-0 opacity-85" />
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-yellow-600' : 'text-slate-400'}`} strokeWidth={isActive ? 2.5 : 2} />
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -110,18 +103,7 @@ export function Sidebar() {
         })}
       </div>
 
-      {/* User Profile Card at the bottom of the sidebar */}
-      <div className="shrink-0 p-4 border-t border-ink-soft mt-auto bg-slate-900">
-        <div className="flex items-center gap-3">
-          <div className="w-[36px] h-[36px] bg-signal text-[#1B1200] rounded-full flex items-center justify-center font-bold text-[14px] shrink-0">
-            {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-[13px] font-bold text-white truncate">{user?.name || "Admin"}</div>
-            <div className="text-[11px] text-slate-400 truncate mt-[1px]">{user?.role || "Tenant Admin"}</div>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 }

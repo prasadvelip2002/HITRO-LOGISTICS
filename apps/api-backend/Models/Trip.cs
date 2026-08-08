@@ -22,11 +22,20 @@ namespace api_backend.Models
         public decimal FreightCharges { get; set; }
         public decimal AdvanceAmount { get; set; }
         public decimal BalanceAmount { get; set; }
+        public string? LRGenerationType { get; set; } // System, Manual
+        public string? ManualLRNumber { get; set; }
         public string? LRNumber { get; set; }
         
         public string BookingType { get; set; } = "Fixed"; // Fixed, PerTon
         public decimal RatePerTon { get; set; }
         public decimal FixedRate { get; set; }
+        
+        public decimal? SupplierRate { get; set; }
+        public decimal? CustomerRate { get; set; }
+        
+        public string? SupervisorName { get; set; }
+        public string? SupervisorContact { get; set; }
+        public string? SupplierPaymentTo { get; set; } // Vendor, Driver
         
         public string Status { get; set; } = "Assigned"; // Assigned, Accepted, Started, Delivered, Closed
 
@@ -40,6 +49,12 @@ namespace api_backend.Models
         public string? EwayBillNumber { get; set; }
         public decimal? TollCharges { get; set; }
         public decimal? FuelAdvance { get; set; }
+
+        public DateTime? PODUploadedDate { get; set; }
+        public DateTime? PODReceivedDate { get; set; }
+
+        public int? BranchId { get; set; }
+        public Branch? Branch { get; set; }
 
         public int TenantId { get; set; }
         public Tenant? Tenant { get; set; }

@@ -51,11 +51,8 @@ export default function LoginPage() {
           <div className="absolute top-[40%] right-[10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[100px]" />
         </div>
 
-        <div className="relative z-10 flex items-center gap-3 font-disp font-bold text-xl tracking-tight">
-          <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center">
-            <Truck className="w-5 h-5 text-white" />
-          </div>
-          RouteLedger TMS
+        <div className="relative z-10 flex items-center h-24">
+          <img src="/logo.png" alt="ADITI TRANS" className="h-full w-auto max-w-[250px] object-contain mix-blend-multiply" />
         </div>
 
         <div className="relative z-10 max-w-lg mt-auto">
@@ -82,11 +79,8 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24 bg-white text-ink">
         <div className="mx-auto w-full max-w-sm lg:w-[400px]">
           <div className="text-center lg:text-left mb-10">
-            <div className="lg:hidden flex items-center justify-center gap-3 font-disp font-bold text-xl tracking-tight mb-8 text-black">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-                <Truck className="w-5 h-5 text-white" />
-              </div>
-              RouteLedger TMS
+            <div className="lg:hidden flex items-center justify-center h-24 mb-8">
+              <img src="/logo.png" alt="ADITI TRANS" className="h-full w-auto max-w-[200px] object-contain mix-blend-multiply" />
             </div>
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 font-disp">Welcome back</h2>
             <p className="mt-2 text-sm text-gray-600">
@@ -101,7 +95,7 @@ export default function LoginPage() {
                 <Input 
                   id="email" 
                   type="email" 
-                  placeholder="admin@routeledger.com" 
+                  placeholder="admin@adititrans.com"
                   required 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

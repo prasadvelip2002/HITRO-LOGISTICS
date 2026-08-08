@@ -10,8 +10,14 @@ namespace api_backend.Models
         public Trip? Trip { get; set; }
 
         public decimal Amount { get; set; }
-        public required string Type { get; set; } // Advance, Final, Unloading
+        public required string Type { get; set; } // Advance, Final, Unloading, Incentive, CourierCharge
         public string? UTRNumber { get; set; }
+        
+        public string? BeneficiaryType { get; set; } // Vendor, Driver
+        public int? DriverId { get; set; }
+        public Driver? Driver { get; set; }
+        public string? BankProofUrl { get; set; }
+        
         public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
         public string Status { get; set; } = "Pending"; // Pending, Completed
 

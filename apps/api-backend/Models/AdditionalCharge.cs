@@ -9,7 +9,7 @@ namespace api_backend.Models
         public int TripId { get; set; }
         public Trip? Trip { get; set; }
 
-        public required string ChargeType { get; set; } // Detention, ExtraKM, Labour, Freight
+        public required string ChargeType { get; set; } // Detention, ExtraKM, Labour, Freight, Halting, ExtraDelivery, Hamali, Miscellaneous, Deduction
         public decimal Amount { get; set; }
         public string Status { get; set; } = "PendingApproval"; // PendingApproval, Approved, Rejected
 

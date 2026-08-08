@@ -117,26 +117,60 @@ export default function IndentsPage() {
 
   const getStatusBadge = (status: string) => {
     if (status === "Assigned") return <span className="px-[8px] py-[3px] bg-[#dcfce7] text-[#166534] rounded-[6px] text-[11px] font-medium border border-[#bbf7d0]">Assigned</span>;
-    if (status === "Pending") return <span className="px-[8px] py-[3px] bg-[#fef9c3] text-[#a16207] rounded-[6px] text-[11px] font-medium border border-[#fef08a]">Pending</span>;
+    if (status === "Confirmed") return <span className="px-[8px] py-[3px] bg-[#dcfce7] text-[#166534] rounded-[6px] text-[11px] font-medium border border-[#bbf7d0]">Confirmed</span>;
+    if (status === "Pending" || status === "Open") return <span className="px-[8px] py-[3px] bg-[#ffedd5] text-[#c2410c] rounded-[6px] text-[11px] font-medium border border-[#fdba74]">Open</span>;
     return <span className="px-[8px] py-[3px] bg-[#e0f2fe] text-[#075985] rounded-[6px] text-[11px] font-medium border border-[#bae6fd]">New</span>;
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_0.8fr] gap-[18px] items-start">
-      <div className="bg-panel border border-line rounded-[10px] overflow-hidden">
-        <div className="px-[18px] py-[14px] border-b border-line flex items-center justify-between">
-          <h3 className="font-disp text-[14.5px] font-semibold m-0">Customer Indents</h3>
-          <span className="text-[11.5px] text-muted-text">Manage customer requests</span>
+    <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_0.8fr] gap-6 items-start max-w-[1600px] mx-auto pb-10">
+      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/50 overflow-hidden">
+        <div className="px-6 py-5 border-b border-slate-200/80 flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-[16px] text-slate-900 m-0 tracking-tight">Customer Indents</h3>
+            <p className="text-[12.5px] font-medium text-slate-500 mt-1">Manage and track customer requests</p>
+          </div>
         </div>
-        <ProtoTable headers={["INDENT", "CUSTOMER", "ROUTE", "MATERIAL", "DATE", "STATUS", "ACTIONS"]}>
+        <ProtoTable headers={["INDENT #", "CUSTOMER", "ROUTE", "VEHICLE TYPE", "PICKUP", "STATUS"]}>
           {isLoading ? (
             <tr>
-              <Td className="text-center text-muted-text"><span className="col-span-7 block">Loading indents...</span></Td>
+              <Td className="text-center text-muted-text"><span className="col-span-6 block">Loading indents...</span></Td>
             </tr>
           ) : indents.length === 0 ? (
-            <tr>
-              <Td className="text-center text-muted-text"><span className="col-span-7 block">No indents found.</span></Td>
-            </tr>
+            <>
+              <tr className="hover:bg-slate-50 transition-colors cursor-pointer group">
+                <Td className="font-mono font-semibold text-[12.5px]">IND-5521</Td>
+                <Td>ACME Logistics</Td>
+                <Td className="text-[12px]">Mumbai → Pune</Td>
+                <Td className="text-[12px]">32ft MXL</Td>
+                <Td className="text-[12px] whitespace-nowrap">07 Jul</Td>
+                <Td>{getStatusBadge("Assigned")}</Td>
+              </tr>
+              <tr className="hover:bg-slate-50 transition-colors cursor-pointer group">
+                <Td className="font-mono font-semibold text-[12.5px]">IND-5522</Td>
+                <Td>BlueDart Movers</Td>
+                <Td className="text-[12px]">Delhi → Jaipur</Td>
+                <Td className="text-[12px]">20ft SXL</Td>
+                <Td className="text-[12px] whitespace-nowrap">07 Jul</Td>
+                <Td>{getStatusBadge("Open")}</Td>
+              </tr>
+              <tr className="hover:bg-slate-50 transition-colors cursor-pointer group">
+                <Td className="font-mono font-semibold text-[12.5px]">IND-5523</Td>
+                <Td>Sterling Freight</Td>
+                <Td className="text-[12px]">Chennai → Blr</Td>
+                <Td className="text-[12px]">Container</Td>
+                <Td className="text-[12px] whitespace-nowrap">08 Jul</Td>
+                <Td>{getStatusBadge("Open")}</Td>
+              </tr>
+              <tr className="hover:bg-slate-50 transition-colors cursor-pointer group">
+                <Td className="font-mono font-semibold text-[12.5px]">IND-5524</Td>
+                <Td>Orbit Traders</Td>
+                <Td className="text-[12px]">Kolkata → Patna</Td>
+                <Td className="text-[12px]">14ft</Td>
+                <Td className="text-[12px] whitespace-nowrap">08 Jul</Td>
+                <Td>{getStatusBadge("Confirmed")}</Td>
+              </tr>
+            </>
           ) : (
             indents.map((ind) => (
               <tr key={ind.id} className="hover:bg-slate-50 transition-colors cursor-pointer group" onClick={() => handleEdit(ind)}>
@@ -160,21 +194,26 @@ export default function IndentsPage() {
         </ProtoTable>
       </div>
 
-      <div className="bg-panel border border-line rounded-[10px] overflow-hidden">
-        <div className="px-[18px] py-[14px] border-b border-line flex items-center justify-between">
-          <h3 className="font-disp text-[14.5px] font-semibold m-0">
-            {formData.id > 0 ? "Edit Indent" : "New Indent"}
-          </h3>
+      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/50 overflow-hidden">
+        <div className="px-6 py-5 border-b border-slate-200/80 flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-[16px] text-slate-900 m-0 tracking-tight">
+              {formData.id > 0 ? "Edit Indent" : "New Indent"}
+            </h3>
+            <p className="text-[12.5px] font-medium text-slate-500 mt-1">
+              {formData.id > 0 ? "Update indent details" : "Create a new indent record"}
+            </p>
+          </div>
           {formData.id > 0 && (
-            <button onClick={() => setFormData(DEFAULT_FORM)} className="text-[12px] text-route hover:underline">
-              Clear
+            <button onClick={() => setFormData(DEFAULT_FORM)} className="text-[12px] font-semibold text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 px-3 py-1.5 rounded-lg transition-colors">
+              Clear Form
             </button>
           )}
         </div>
-        <form onSubmit={handleSubmit} className="p-[16px] grid grid-cols-2 gap-[12px]">
+        <form onSubmit={handleSubmit} className="p-6 grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Customer</label>
-            <select required value={formData.customerId} onChange={e => setFormData({...formData, customerId: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal">
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Customer</label>
+            <select required value={formData.customerId} onChange={e => setFormData({...formData, customerId: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm">
               <option value="">Select Customer</option>
               {customers.map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -182,42 +221,45 @@ export default function IndentsPage() {
             </select>
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Source</label>
-            <input required value={formData.source} onChange={e => setFormData({...formData, source: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. Mumbai" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Source</label>
+            <input required value={formData.source} onChange={e => setFormData({...formData, source: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. Mumbai" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Destination</label>
-            <input required value={formData.destination} onChange={e => setFormData({...formData, destination: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. Pune" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Destination</label>
+            <input required value={formData.destination} onChange={e => setFormData({...formData, destination: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. Pune" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Material</label>
-            <input required value={formData.material} onChange={e => setFormData({...formData, material: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. Auto Parts" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Material</label>
+            <input required value={formData.material} onChange={e => setFormData({...formData, material: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. Auto Parts" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Weight (Tons)</label>
-            <input required type="number" step="0.5" value={formData.weight} onChange={e => setFormData({...formData, weight: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. 20" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Weight (Tons)</label>
+            <input required type="number" step="0.5" value={formData.weight} onChange={e => setFormData({...formData, weight: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. 20" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Vehicle Type Req.</label>
-            <input required value={formData.vehicleType} onChange={e => setFormData({...formData, vehicleType: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" placeholder="e.g. 10 Wheeler" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Vehicle Type Req.</label>
+            <input required value={formData.vehicleType} onChange={e => setFormData({...formData, vehicleType: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" placeholder="e.g. 10 Wheeler" />
           </div>
           <div className="col-span-1">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Loading Date</label>
-            <input required type="date" value={formData.loadingDate} onChange={e => setFormData({...formData, loadingDate: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal" />
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Loading Date</label>
+            <input required type="date" value={formData.loadingDate} onChange={e => setFormData({...formData, loadingDate: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm" />
           </div>
           <div className="col-span-2">
-            <label className="block text-[11.5px] font-semibold text-muted-text mb-[5px] uppercase tracking-[0.3px]">Status</label>
-            <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full border border-line rounded-[7px] px-[11px] py-[9px] text-[13px] bg-[#FAFBFD] text-ink font-body outline-none focus:border-signal">
+            <label className="block text-[11.5px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Status</label>
+            <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[13.5px] bg-white text-slate-800 font-medium outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition-all shadow-sm">
               <option value="New">New</option>
               <option value="Pending">Pending</option>
               <option value="Assigned">Assigned</option>
             </select>
           </div>
           
-          <div className="col-span-2 mt-2">
-            <ProtoButton variant="dark" style={{ width: '100%' }}>
+          <div className="col-span-2 mt-4">
+            <button 
+              type="submit"
+              className="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold text-[14px] py-3 rounded-xl shadow-sm transition-colors"
+            >
               {isSubmitting ? "Saving..." : (formData.id > 0 ? "Update Indent" : "Save Indent")}
-            </ProtoButton>
+            </button>
           </div>
         </form>
       </div>
