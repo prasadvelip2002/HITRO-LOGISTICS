@@ -62,11 +62,9 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Always enable Swagger for the demo
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -77,6 +75,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGet("/", () => "Hitro Logistics API is running successfully on Render! Navigate to /swagger to view the API documentation.");
 
 var summaries = new[]
 {
