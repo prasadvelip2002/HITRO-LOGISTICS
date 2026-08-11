@@ -53,12 +53,52 @@ namespace api_backend.Controllers
             }
         }
 
+        // POST: api/Trips/5/create-outbound-leg
+        [HttpPost("{id}/create-outbound-leg")]
+        public async Task<IActionResult> CreateOutboundLeg(int id)
+        {
+            var leg1Trip = await _context.Trips
+                .Include(t => t.Indent)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (leg1Trip == null)
+            {
+                return NotFound(new { message = "Leg 1 Trip not found." });
+            }
+
+            var leg2Trip = new Trip
+            {
+                IndentId = leg1Trip.IndentId,
+                LegType = "OutboundLeg2",
+                ParentTripId = leg1Trip.Id,
+                Status = "Assigned",
+                TenantId = leg1Trip.TenantId,
+                LRGenerationType = leg1Trip.LRGenerationType,
+                BookingType = leg1Trip.BookingType,
+                RatePerTon = leg1Trip.RatePerTon,
+                FixedRate = leg1Trip.FixedRate
+            };
+
+            _context.Trips.Add(leg2Trip);
+
+            if (leg1Trip.LegType == "Direct")
+            {
+                leg1Trip.LegType = "InboundLeg1";
+                _context.Entry(leg1Trip).State = EntityState.Modified;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(leg2Trip);
+        }
+
         // GET: api/Trips
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Trip>>> GetTrips()
         {
             return await _context.Trips
                 .Include(t => t.Indent)
+                    .ThenInclude(i => i.Customer)
                 .Include(t => t.Vendor)
                 .Include(t => t.Vehicle)
                 .Include(t => t.Driver)
@@ -71,6 +111,7 @@ namespace api_backend.Controllers
         {
             var trip = await _context.Trips
                 .Include(t => t.Indent)
+                    .ThenInclude(i => i.Customer)
                 .Include(t => t.Vendor)
                 .Include(t => t.Vehicle)
                 .Include(t => t.Driver)

@@ -46,6 +46,11 @@ namespace api_backend.Data
             } 
         }
 
+        public DbSet<VendorQuotation> VendorQuotations { get; set; }
+        public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+        public DbSet<GRPO> GRPOs { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -65,6 +70,10 @@ namespace api_backend.Data
             modelBuilder.Entity<SupplierQuotation>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
             modelBuilder.Entity<TripEvent>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
             modelBuilder.Entity<CustomerRateContract>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
+            modelBuilder.Entity<VendorQuotation>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
+            modelBuilder.Entity<PurchaseOrder>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
+            modelBuilder.Entity<GRPO>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
+            modelBuilder.Entity<Invoice>().HasQueryFilter(x => x.TenantId == CurrentTenantId);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

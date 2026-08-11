@@ -6,7 +6,7 @@ async function seedData() {
         await fetch(`${API_BASE_URL}/auth/setup`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tenantName: 'Aditi Trans', adminEmail: 'admin@example.com', adminPassword: 'password123' })
+            body: JSON.stringify({ tenantName: 'Hitro Logistics', adminEmail: 'admin@example.com', adminPassword: 'password123' })
         });
 
         console.log("Logging in to get token...");

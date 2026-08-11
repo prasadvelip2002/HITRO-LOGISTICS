@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -120,6 +120,79 @@ namespace api_backend.Controllers
         {
             return _context.Documents.Any(e => e.Id == id);
         }
+
+        // GET: api/Documents/pod/{token}
+        [HttpGet("pod/{token}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTripByPODToken(string token)
+        {
+            var trip = await _context.Trips
+                .Include(t => t.Indent)
+                .ThenInclude(i => i.Customer)
+                .Include(t => t.Vehicle)
+                .FirstOrDefaultAsync(t => t.PODMagicLinkToken == token);
+
+            if (trip == null) return NotFound("Invalid or expired POD link.");
+
+            return Ok(new {
+                tripId = trip.Id,
+                customer = trip.Indent?.Customer?.Name,
+                source = trip.Indent?.Source,
+                destination = trip.Indent?.Destination,
+                vehicle = trip.Vehicle?.VehicleNumber,
+                status = trip.Status,
+                isAlreadyUploaded = trip.PODUploadedDate != null
+            });
+        }
+
+        // POST: api/Documents/pod/submit/{token}
+        [HttpPost("pod/submit/{token}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SubmitPOD(string token, [FromBody] SubmitPODRequest request)
+        {
+            var trip = await _context.Trips.FirstOrDefaultAsync(t => t.PODMagicLinkToken == token);
+            if (trip == null) return NotFound("Invalid token.");
+
+            // Create Document record
+            var doc = new Document
+            {
+                EntityType = "POD",
+                EntityId = trip.Id,
+                DocumentType = "DeliveryReceipt",
+                FileUrl = request.FileUrl,
+                TenantId = trip.TenantId
+            };
+            _context.Documents.Add(doc);
+
+            // Update Trip
+            trip.PODUploadedDate = System.DateTime.UtcNow;
+            trip.Status = "Delivered";
+            _context.Entry(trip).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "POD submitted successfully" });
+        }
+
+        // POST: api/Documents/pod/approve/{tripId}
+        [HttpPost("pod/approve/{tripId}")]
+        public async Task<IActionResult> ApprovePOD(int tripId)
+        {
+            var trip = await _context.Trips.FindAsync(tripId);
+            if (trip == null) return NotFound();
+
+            trip.PODReceivedDate = System.DateTime.UtcNow;
+            // Trip is now closed for billing
+            trip.Status = "Closed";
+            _context.Entry(trip).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "POD approved and Trip Closed" });
+        }
+    }
+
+    public class SubmitPODRequest
+    {
+        public string FileUrl { get; set; } = string.Empty;
     }
 }
 

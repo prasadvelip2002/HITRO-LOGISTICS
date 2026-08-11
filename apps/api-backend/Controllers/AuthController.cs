@@ -31,6 +31,38 @@ namespace api_backend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            // Demo backdoor for the mobile app presentation
+            if (request.Email == "driver1@example.com")
+            {
+                var demoTenantId = await _context.Tenants.Select(t => t.Id).FirstOrDefaultAsync();
+                var demoUserId = 999;
+                
+                var demoKey = _configuration["Jwt:Key"] ?? "SuperSecretKeyForTransportManagementSystem!123";
+                var demoSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(demoKey));
+                var demoCredentials = new SigningCredentials(demoSecurityKey, SecurityAlgorithms.HmacSha256);
+
+                var demoClaims = new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, demoUserId.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email, request.Email),
+                    new Claim("TenantId", demoTenantId.ToString()),
+                    new Claim(ClaimTypes.Role, "Driver")
+                };
+
+                var demoToken = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: demoClaims,
+                    expires: DateTime.Now.AddHours(24),
+                    signingCredentials: demoCredentials);
+
+                return Ok(new
+                {
+                    token = new JwtSecurityTokenHandler().WriteToken(demoToken),
+                    user = new { Id = demoUserId, Name = "Demo Driver", Email = request.Email, Role = "Driver", TenantId = demoTenantId }
+                });
+            }
+
             // Note: In a real app, hash the password and compare. Here we just match the plain text for the sake of the exercise, 
             // but we named it PasswordHash in the model.
             var user = await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Email == request.Email && u.PasswordHash == request.Password);

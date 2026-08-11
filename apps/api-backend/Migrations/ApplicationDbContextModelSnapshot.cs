@@ -279,6 +279,52 @@ namespace api_backend.Migrations
                     b.ToTable("Drivers");
                 });
 
+            modelBuilder.Entity("api_backend.Models.GRPO", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("DamagedQuantity")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("GRPONumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PODDocumentUrl")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("ReceivedQuantity")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PurchaseOrderId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("GRPOs");
+                });
+
             modelBuilder.Entity("api_backend.Models.Indent", b =>
                 {
                     b.Property<int>("Id")
@@ -348,6 +394,55 @@ namespace api_backend.Migrations
                     b.HasIndex("TenantId");
 
                     b.ToTable("Indents");
+                });
+
+            modelBuilder.Entity("api_backend.Models.Invoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("GrandTotal")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("InvoiceDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("InvoiceNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("api_backend.Models.Notification", b =>
@@ -437,6 +532,51 @@ namespace api_backend.Migrations
                     b.HasIndex("TripId");
 
                     b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("api_backend.Models.PurchaseOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AdvancePaid")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PONumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("TripId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VendorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TripId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("PurchaseOrders");
                 });
 
             modelBuilder.Entity("api_backend.Models.SupplierQuotation", b =>
@@ -554,13 +694,27 @@ namespace api_backend.Migrations
                     b.Property<int>("IndentId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("InvoiceId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsVendorSettled")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LRGenerationType")
                         .HasColumnType("text");
 
                     b.Property<string>("LRNumber")
                         .HasColumnType("text");
 
+                    b.Property<string>("LegType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("ManualLRNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PODMagicLinkToken")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("PODReceivedDate")
@@ -568,6 +722,9 @@ namespace api_backend.Migrations
 
                     b.Property<DateTime?>("PODUploadedDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ParentTripId")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("RatePerTon")
                         .HasColumnType("numeric");
@@ -616,6 +773,10 @@ namespace api_backend.Migrations
                     b.HasIndex("DriverId");
 
                     b.HasIndex("IndentId");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.HasIndex("ParentTripId");
 
                     b.HasIndex("TenantId");
 
@@ -831,6 +992,54 @@ namespace api_backend.Migrations
                     b.ToTable("Vendors");
                 });
 
+            modelBuilder.Entity("api_backend.Models.VendorQuotation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("IndentId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MagicLinkToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProposedVehicleType")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("QuotedRate")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VendorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IndentId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("VendorQuotations");
+                });
+
             modelBuilder.Entity("api_backend.Models.WhatsAppLog", b =>
                 {
                     b.Property<int>("Id")
@@ -946,6 +1155,25 @@ namespace api_backend.Migrations
                     b.Navigation("Tenant");
                 });
 
+            modelBuilder.Entity("api_backend.Models.GRPO", b =>
+                {
+                    b.HasOne("api_backend.Models.PurchaseOrder", "PurchaseOrder")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api_backend.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PurchaseOrder");
+
+                    b.Navigation("Tenant");
+                });
+
             modelBuilder.Entity("api_backend.Models.Indent", b =>
                 {
                     b.HasOne("api_backend.Models.Branch", "Branch")
@@ -965,6 +1193,25 @@ namespace api_backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Branch");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("api_backend.Models.Invoice", b =>
+                {
+                    b.HasOne("api_backend.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api_backend.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Customer");
 
@@ -1005,6 +1252,33 @@ namespace api_backend.Migrations
                     b.Navigation("Tenant");
 
                     b.Navigation("Trip");
+                });
+
+            modelBuilder.Entity("api_backend.Models.PurchaseOrder", b =>
+                {
+                    b.HasOne("api_backend.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api_backend.Models.Trip", "Trip")
+                        .WithMany()
+                        .HasForeignKey("TripId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api_backend.Models.Vendor", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+
+                    b.Navigation("Trip");
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("api_backend.Models.SupplierQuotation", b =>
@@ -1052,6 +1326,14 @@ namespace api_backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("api_backend.Models.Invoice", "Invoice")
+                        .WithMany("Trips")
+                        .HasForeignKey("InvoiceId");
+
+                    b.HasOne("api_backend.Models.Trip", "ParentTrip")
+                        .WithMany()
+                        .HasForeignKey("ParentTripId");
+
                     b.HasOne("api_backend.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
@@ -1075,6 +1357,10 @@ namespace api_backend.Migrations
                     b.Navigation("Driver");
 
                     b.Navigation("Indent");
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("ParentTrip");
 
                     b.Navigation("Tenant");
 
@@ -1147,6 +1433,33 @@ namespace api_backend.Migrations
                     b.Navigation("Tenant");
                 });
 
+            modelBuilder.Entity("api_backend.Models.VendorQuotation", b =>
+                {
+                    b.HasOne("api_backend.Models.Indent", "Indent")
+                        .WithMany()
+                        .HasForeignKey("IndentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api_backend.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api_backend.Models.Vendor", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Indent");
+
+                    b.Navigation("Tenant");
+
+                    b.Navigation("Vendor");
+                });
+
             modelBuilder.Entity("api_backend.Models.WhatsAppLog", b =>
                 {
                     b.HasOne("api_backend.Models.Tenant", "Tenant")
@@ -1159,6 +1472,11 @@ namespace api_backend.Migrations
                 });
 
             modelBuilder.Entity("api_backend.Models.Driver", b =>
+                {
+                    b.Navigation("Trips");
+                });
+
+            modelBuilder.Entity("api_backend.Models.Invoice", b =>
                 {
                     b.Navigation("Trips");
                 });

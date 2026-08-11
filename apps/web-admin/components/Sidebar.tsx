@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Grid, Users, Truck, CreditCard, Paperclip, FileText, Handshake, DollarSign, Camera, Plus, Check, Bell, BarChart2, Bot } from "lucide-react";
+import { Grid, Users, Truck, CreditCard, Paperclip, FileText, Handshake, DollarSign, Camera, Plus, Check, Bell, BarChart2, Bot, ShoppingCart, Wallet, Map as MapIcon } from "lucide-react";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -27,7 +27,8 @@ export function Sidebar() {
     {
       group: 'Overview',
       items: [
-        { href: '/', label: 'Dashboard', icon: Grid, roles: ['Tenant Admin', 'Manager', 'Accounts', 'Internal User'] }
+        { href: '/', label: 'Dashboard', icon: Grid, roles: ['Tenant Admin', 'Manager', 'Accounts', 'Internal User'] },
+        { href: '/map', label: 'Fleet Map Dashboard', icon: MapIcon, roles: ['Tenant Admin', 'Manager', 'Internal User'] }
       ]
     },
     {
@@ -43,12 +44,14 @@ export function Sidebar() {
       group: 'Trip Lifecycle',
       items: [
         { href: '/trips/indents', label: 'Indent Management', icon: FileText, roles: ['Tenant Admin', 'Internal User', 'Manager'] },
+        { href: '/trips/procurement', label: 'Procurement (RFQ)', icon: ShoppingCart, roles: ['Tenant Admin', 'Internal User', 'Manager'] },
         { href: '/trips/confirmation', label: 'Trip Confirmation Sheet', icon: Paperclip, roles: ['Tenant Admin', 'Internal User'] },
         { href: '/trips/assignment', label: 'Trip Assignment', icon: Handshake, roles: ['Tenant Admin', 'Internal User', 'Manager'] },
         { href: '/trips/advance-payment', label: 'Advance Payment', icon: DollarSign, roles: ['Tenant Admin', 'Accounts'] },
-        { href: '/trips/pod', label: 'POD Review', icon: Camera, roles: ['Tenant Admin', 'Internal User'] },
+        { href: '/trips/pod', label: 'POD Review', icon: Camera, roles: ['Tenant Admin', 'Internal User', 'Manager'] },
         { href: '/trips/charges', label: 'Additional Charges', icon: Plus, roles: ['Tenant Admin', 'Internal User', 'Accounts'] },
-        { href: '/approvals', label: 'Manager Approval', icon: Check, roles: ['Tenant Admin', 'Manager'] },
+        { href: '/payments/settlements', label: 'Vendor Settlements', icon: Wallet, roles: ['Tenant Admin', 'Accounts'] },
+        { href: '/payments/invoices', label: 'Customer Invoices', icon: FileText, roles: ['Tenant Admin', 'Accounts'] },
         { href: '/payments', label: 'Final Payment', icon: DollarSign, roles: ['Tenant Admin', 'Accounts'] },
         { href: '/automation', label: 'Automation Logs', icon: Bot, roles: ['Tenant Admin', 'Manager'] },
       ]
@@ -64,9 +67,11 @@ export function Sidebar() {
   ];
 
   return (
-    <div className="w-[260px] shrink-0 bg-slate-100 text-slate-600 flex flex-col h-full border-r border-slate-200/80">
-      <div className="h-[100px] shrink-0 flex items-center px-4 justify-center mb-2">
-        <img src="/logo.png" alt="ADITI TRANS" className="w-full h-[75px] object-contain mix-blend-multiply" />
+    <div className="w-[260px] shrink-0 bg-[#0F172A] text-slate-400 flex flex-col h-full border-r border-slate-800 relative z-40">
+      <div className="h-[100px] shrink-0 flex items-center px-5 justify-center mb-2 border-b border-slate-800/80">
+        <div className="bg-white/95 backdrop-blur px-4 py-2.5 rounded-xl w-full flex justify-center shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+          <img src="/logo.png" alt="HITRO LOGISTICS" className="w-[160px] h-[45px] object-contain mix-blend-multiply" />
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto pb-4 scrollbar-hide">
@@ -77,7 +82,7 @@ export function Sidebar() {
 
           return (
             <div key={i}>
-              <div className="font-sans text-[11px] tracking-wider text-slate-400 font-semibold uppercase px-6 pt-5 pb-2">
+              <div className="font-sans text-[11px] tracking-wider text-slate-500 font-bold uppercase px-6 pt-5 pb-2">
                 {g.group}
               </div>
               {visibleItems.map((item, j) => {
@@ -87,13 +92,13 @@ export function Sidebar() {
                   <Link
                     key={j}
                     href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2.5 mx-3 my-1 text-[13.5px] cursor-pointer rounded-md transition-all duration-200
+                    className={`flex items-center gap-3 px-3 py-2.5 mx-3 my-1 text-[13.5px] cursor-pointer rounded-xl transition-all duration-300 group
                       ${isActive 
-                        ? 'bg-white text-yellow-700 font-semibold shadow-sm ring-1 ring-slate-200/50' 
-                        : 'text-slate-500 hover:bg-slate-100/50 hover:text-slate-900 font-medium'
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-[0_4px_12px_rgba(249,115,22,0.25)]' 
+                        : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium border border-transparent'
                       }`}
                   >
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-yellow-600' : 'text-slate-400'}`} strokeWidth={isActive ? 2.5 : 2} />
+                    <Icon className={`w-4 h-4 shrink-0 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-orange-500'}`} strokeWidth={isActive ? 2.5 : 2} />
                     <span>{item.label}</span>
                   </Link>
                 );

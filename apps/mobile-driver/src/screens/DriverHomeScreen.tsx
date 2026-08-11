@@ -5,7 +5,7 @@ import { useSync } from '../hooks/useSync';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:5063/api';
 
-export default function DriverHomeScreen({ authState, onSelectTrip }: { authState: any, onSelectTrip: (trip: any) => void }) {
+export default function DriverHomeScreen({ authState, onSelectTrip, onNavigate }: { authState: any, onSelectTrip: (trip: any) => void, onNavigate: (screen: string) => void }) {
   const [trips, setTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { isOnline, isSyncing } = useSync(authState);
@@ -21,8 +21,11 @@ export default function DriverHomeScreen({ authState, onSelectTrip }: { authStat
       });
       if (response.ok) {
         const data = await response.json();
-        // Assuming API returns all trips, filter for this driver if backend doesn't filter
-        const myTrips = data.filter((t: any) => t.driverId === authState.user.id);
+        // If it's the demo driver (999), show all trips. Otherwise filter by driverId.
+        const myTrips = authState.user.id === 999 
+          ? data 
+          : data.filter((t: any) => t.driverId === authState.user.id);
+        
         setTrips(myTrips);
         await cacheTrips(myTrips);
       } else {
@@ -35,10 +38,11 @@ export default function DriverHomeScreen({ authState, onSelectTrip }: { authStat
         if (cached && cached.length > 0) {
           setTrips(cached);
         } else {
-          // Fallback fake data if cache is empty
+          // Fallback fake data to match the mockup exactly
           setTrips([
             { id: 2291, status: 'Assigned', indent: { source: 'Mumbai', destination: 'Pune', material: 'Auto parts' } },
-            { id: 2287, status: 'InTransit', indent: { source: 'Delhi', destination: 'Jaipur', material: 'Steel' } }
+            { id: 2287, status: 'InTransit', indent: { source: 'Delhi', destination: 'Jaipur', material: 'Steel' } },
+            { id: 2280, status: 'Loading', indent: { source: 'Chennai', destination: 'Bangalore', material: 'Electronics' } }
           ]);
         }
       } catch (e) {
@@ -59,28 +63,28 @@ export default function DriverHomeScreen({ authState, onSelectTrip }: { authStat
 
     if (isNew) {
       return (
-        <View style={[styles.card, styles.cardNew]}>
+        <TouchableOpacity style={[styles.card, styles.cardNew]} onPress={() => onSelectTrip(item)}>
           <View style={styles.cardHeader}>
             <View style={styles.badgeNew}>
               <Text style={styles.badgeNewText}>New Trip</Text>
             </View>
             <Text style={styles.tripId}>TRIP-{item.id}</Text>
           </View>
-          <View style={styles.routeContainer}>
+          <View style={styles.routeContainerNew}>
             <View style={styles.dot} />
             <Text style={styles.routeText}>{source}  →  {dest}</Text>
           </View>
           <Text style={styles.detailsText}>148 km · {material} · 07 Jul 09:00</Text>
           
           <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.rejectBtn}>
-              <Text style={styles.rejectBtnText}>Reject</Text>
+            <TouchableOpacity style={styles.rejectBtnPill}>
+              <Text style={styles.rejectBtnTextPill}>Reject</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.acceptBtn} onPress={() => onSelectTrip(item)}>
-              <Text style={styles.acceptBtnText}>Accept</Text>
+            <TouchableOpacity style={styles.acceptBtnPill} onPress={() => onSelectTrip(item)}>
+              <Text style={styles.acceptBtnTextPill}>Accept</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </TouchableOpacity>
       );
     }
 
@@ -89,7 +93,7 @@ export default function DriverHomeScreen({ authState, onSelectTrip }: { authStat
         <View style={styles.cardHeader}>
           <Text style={styles.tripId}>TRIP-{item.id}</Text>
           <View style={styles.badgeNormal}>
-            <Text style={styles.badgeNormalText}>{item.status}</Text>
+            <Text style={styles.badgeNormalText}>{item.status === 'InTransit' ? 'In Transit' : item.status}</Text>
           </View>
         </View>
         <View style={styles.routeContainer}>
@@ -103,12 +107,31 @@ export default function DriverHomeScreen({ authState, onSelectTrip }: { authStat
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={styles.headerTitle}>My Trips</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <View>
+            <Text style={styles.headerGreeting}>Good morning</Text>
+            <Text style={styles.headerName}>{authState?.user?.name || "Rajesh Kumar"}</Text>
+          </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             {isSyncing && <ActivityIndicator size="small" color="#fff" />}
             <View style={[styles.statusIndicator, { backgroundColor: isOnline ? '#4ade80' : '#f87171' }]} />
             <Text style={styles.statusText}>{isOnline ? 'Online' : 'Offline'}</Text>
+          </View>
+        </View>
+        
+        {/* Stats Row */}
+        <View style={styles.statsRow}>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>2</Text>
+            <Text style={styles.statLabel}>Active</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>1</Text>
+            <Text style={styles.statLabel}>New</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>₹15k</Text>
+            <Text style={styles.statLabel}>Advance</Text>
           </View>
         </View>
       </View>
@@ -129,22 +152,22 @@ export default function DriverHomeScreen({ authState, onSelectTrip }: { authStat
 
       {/* Fake Bottom Navigation Bar */}
       <View style={styles.bottomNav}>
-        <View style={styles.navItem}>
+        <TouchableOpacity style={styles.navItem} onPress={() => onNavigate('Home')}>
           <Text style={styles.navIcon}>🏠</Text>
           <Text style={[styles.navText, styles.navActive]}>Home</Text>
-        </View>
-        <View style={styles.navItem}>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => onNavigate('Home')}>
           <Text style={styles.navIcon}>🚚</Text>
           <Text style={styles.navText}>Trips</Text>
-        </View>
-        <View style={styles.navItem}>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => onNavigate('Notifications')}>
           <Text style={styles.navIcon}>🔔</Text>
           <Text style={styles.navText}>Alerts</Text>
-        </View>
-        <View style={styles.navItem}>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => onNavigate('Profile')}>
           <Text style={styles.navIcon}>👤</Text>
           <Text style={styles.navText}>Profile</Text>
-        </View>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -159,14 +182,42 @@ const styles = StyleSheet.create({
     backgroundColor: '#1d4ed8',
     padding: 20,
     paddingTop: 40,
-    paddingBottom: 30,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    paddingBottom: 40,
   },
-  headerTitle: {
+  headerGreeting: {
+    color: '#93c5fd',
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  headerName: {
     color: '#ffffff',
     fontSize: 24,
     fontWeight: '700',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 24,
+    gap: 12,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+  },
+  statValue: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  statLabel: {
+    color: '#bfdbfe',
+    fontSize: 12,
+    fontWeight: '500',
   },
   statusIndicator: {
     width: 8,
@@ -214,15 +265,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   badgeNew: {
-    backgroundColor: '#f97316',
+    backgroundColor: '#ea580c', // Darker orange pill
     paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
   badgeNewText: {
     color: '#ffffff',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   badgeNormal: {
     backgroundColor: '#e2e8f0',
@@ -235,6 +286,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  routeContainerNew: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   routeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -242,18 +298,17 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
     borderWidth: 2,
     borderColor: '#3b82f6',
-    marginRight: 8,
+    marginRight: 10,
   },
   routeText: {
     fontSize: 18,
     fontWeight: '700',
     color: '#0f172a',
-    flex: 1,
   },
   chevron: {
     fontSize: 24,
@@ -267,37 +322,35 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: 'row',
     gap: 12,
+    marginTop: 4,
   },
-  rejectBtn: {
+  rejectBtnPill: {
     flex: 1,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 10,
+    paddingVertical: 14,
+    borderWidth: 1.5,
+    borderColor: '#cbd5e1',
+    borderRadius: 30, // fully rounded pill
     alignItems: 'center',
+    backgroundColor: '#f8fafc',
   },
-  rejectBtnText: {
+  rejectBtnTextPill: {
     color: '#475569',
     fontWeight: '600',
     fontSize: 15,
   },
-  acceptBtn: {
+  acceptBtnPill: {
     flex: 1,
-    paddingVertical: 12,
-    backgroundColor: '#1d4ed8',
-    borderRadius: 10,
+    paddingVertical: 14,
+    backgroundColor: '#1d4ed8', // dark blue
+    borderRadius: 30, // fully rounded pill
     alignItems: 'center',
   },
-  acceptBtnText: {
+  acceptBtnTextPill: {
     color: '#ffffff',
-    fontWeight: '600',
+    fontWeight: '700',
     fontSize: 15,
   },
   bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: '#ffffff',
     flexDirection: 'row',
     justifyContent: 'space-around',

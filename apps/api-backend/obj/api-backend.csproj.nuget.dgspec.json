@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ADITI_TRANS\\apps\\api-backend\\api-backend.csproj": {}
+    "D:\\HITRO-LOGISTICS\\apps\\api-backend\\api-backend.csproj": {}
   },
   "projects": {
-    "D:\\ADITI_TRANS\\apps\\api-backend\\api-backend.csproj": {
+    "D:\\HITRO-LOGISTICS\\apps\\api-backend\\api-backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ADITI_TRANS\\apps\\api-backend\\api-backend.csproj",
+        "projectUniqueName": "D:\\HITRO-LOGISTICS\\apps\\api-backend\\api-backend.csproj",
         "projectName": "api-backend",
-        "projectPath": "D:\\ADITI_TRANS\\apps\\api-backend\\api-backend.csproj",
+        "projectPath": "D:\\HITRO-LOGISTICS\\apps\\api-backend\\api-backend.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\ADITI_TRANS\\apps\\api-backend\\obj\\",
+        "outputPath": "D:\\HITRO-LOGISTICS\\apps\\api-backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -52,12 +52,22 @@ namespace api_backend.Models
 
         public DateTime? PODUploadedDate { get; set; }
         public DateTime? PODReceivedDate { get; set; }
+        
+        public string PODMagicLinkToken { get; set; } = Guid.NewGuid().ToString();
 
         public int? BranchId { get; set; }
         public Branch? Branch { get; set; }
 
         public int TenantId { get; set; }
         public Tenant? Tenant { get; set; }
+
+        public string LegType { get; set; } = "Direct"; // Direct, InboundLeg1, OutboundLeg2
+        public int? ParentTripId { get; set; }
+        public Trip? ParentTrip { get; set; }
+
+        public int? InvoiceId { get; set; }
+        public Invoice? Invoice { get; set; }
+        public bool IsVendorSettled { get; set; } = false;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

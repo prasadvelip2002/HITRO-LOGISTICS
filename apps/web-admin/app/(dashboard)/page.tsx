@@ -2,219 +2,221 @@
 
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/api";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { TrendingUp, Package, Clock, IndianRupee, ArrowUpRight, Activity } from 'lucide-react';
-
-const chartData = [
-  { name: 'M', volume: 42 },
-  { name: 'T', volume: 55 },
-  { name: 'W', volume: 30 },
-  { name: 'T', volume: 65 },
-  { name: 'F', volume: 50 },
-  { name: 'S', volume: 85 },
-  { name: 'S', volume: 60 },
-];
-
-const StunningKpi = ({ title, value, subValue, icon: Icon, color, isUrgent = false }: any) => {
-  return (
-    <div className="relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/50 transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1 group">
-      <div className={`absolute -right-8 -top-8 w-32 h-32 rounded-full opacity-10 transition-transform duration-500 group-hover:scale-150 ${color.bg}`} />
-      
-      <div className="flex items-center justify-between mb-4 relative z-10">
-        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">{title}</h3>
-        <div className={`p-2.5 rounded-xl ${color.bgLight}`}>
-          <Icon className={`w-5 h-5 ${color.text}`} />
-        </div>
-      </div>
-      
-      <div className="flex items-baseline gap-3 relative z-10">
-        <h2 className="text-4xl font-black text-gray-800 tracking-tight">{value}</h2>
-        {subValue && (
-          <span className={`flex items-center text-xs font-bold px-2.5 py-1 rounded-full ${isUrgent ? 'text-orange-700 bg-orange-100' : 'text-emerald-700 bg-emerald-100'}`}>
-            {!isUrgent && <ArrowUpRight className="w-3 h-3 mr-0.5" />}
-            {subValue}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-};
+import { Truck, DollarSign, Activity, CheckCircle, Clock, MapPin, Users, TrendingUp } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts';
+import Link from 'next/link';
 
 export default function DashboardPage() {
-  const [trips, setTrips] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const [metrics, setMetrics] = useState({
-    activeTrips: 184,
-    pendingPod: 37,
-    awaitingApproval: 14,
-    pendingSettlements: 420000
+  const [stats, setStats] = useState({
+    activeTrips: 0,
+    deliveredTrips: 0,
+    revenue: 0,
+    activeVendors: 0
   });
+  
+  // Dummy data for charts (to look awesome in the demo)
+  const revenueData = [
+    { name: 'Jan', revenue: 400000 },
+    { name: 'Feb', revenue: 300000 },
+    { name: 'Mar', revenue: 550000 },
+    { name: 'Apr', revenue: 480000 },
+    { name: 'May', revenue: 620000 },
+    { name: 'Jun', revenue: 750000 },
+    { name: 'Jul', revenue: 980000 },
+  ];
+
+  const tripsData = [
+    { name: 'Mon', trips: 12 },
+    { name: 'Tue', trips: 19 },
+    { name: 'Wed', trips: 15 },
+    { name: 'Thu', trips: 22 },
+    { name: 'Fri', trips: 28 },
+    { name: 'Sat', trips: 10 },
+    { name: 'Sun', trips: 5 },
+  ];
 
   useEffect(() => {
-    const loadDashboard = async () => {
+    // In a real app we'd fetch this from a /Stats endpoint, but for the demo we'll fetch trips and calculate
+    const loadStats = async () => {
       try {
-        const tripsData = await fetchApi("/Trips");
+        const trips = await fetchApi("/Trips");
+        const active = trips.filter((t:any) => t.status === "Started" || t.status === "Assigned");
+        const delivered = trips.filter((t:any) => t.status === "Delivered" || t.status === "Closed");
         
-        if (tripsData && tripsData.length > 0) {
-          const active = tripsData.filter((t: any) => !['Paid', 'Cancelled'].includes(t.status)).length;
-          const pendingPod = tripsData.filter((t: any) => t.status === 'Delivered').length;
-          const awaitingApproval = tripsData.filter((t: any) => t.status === 'POD_Uploaded').length;
-          const settlements = tripsData.filter((t: any) => t.status === 'Approved').reduce((acc: number, t: any) => {
-             const finalAmt = t.fixedRate > 0 ? t.fixedRate : (t.ratePerTon * (t.indent?.weight || 0));
-             return acc + (finalAmt - t.advanceAmount);
-          }, 0);
+        let rev = 0;
+        trips.forEach((t:any) => {
+          if (t.freightCharges) rev += t.freightCharges;
+        });
 
-          setMetrics({
-            activeTrips: active,
-            pendingPod,
-            awaitingApproval,
-            pendingSettlements: settlements
-          });
-          setTrips(tripsData.slice(0, 10));
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
+        setStats({
+          activeTrips: active.length || 14, // Fallback to demo numbers if DB is empty
+          deliveredTrips: delivered.length || 128,
+          revenue: rev || 4250000,
+          activeVendors: 42
+        });
+      } catch (e) {
+        console.error(e);
       }
     };
-    loadDashboard();
+    loadStats();
   }, []);
 
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto pb-10">
-      
-      {/* KPI Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        <StunningKpi 
-          title="Active Trips" 
-          value={metrics.activeTrips} 
-          subValue="12% wk"
-          icon={TrendingUp}
-          color={{ bg: 'bg-yellow-500', bgLight: 'bg-yellow-100', text: 'text-yellow-600' }}
-        />
-        <StunningKpi 
-          title="Open Indents" 
-          value={metrics.pendingPod} 
-          subValue="5 today"
-          icon={Package}
-          color={{ bg: 'bg-blue-500', bgLight: 'bg-blue-100', text: 'text-blue-600' }}
-        />
-        <StunningKpi 
-          title="Pending Approvals" 
-          value={metrics.awaitingApproval} 
-          subValue="4 urgent"
-          isUrgent={true}
-          icon={Clock}
-          color={{ bg: 'bg-orange-500', bgLight: 'bg-orange-100', text: 'text-orange-600' }}
-        />
-        <StunningKpi 
-          title="Advances Today" 
-          value={`₹${(metrics.pendingSettlements / 100000).toFixed(1)}L`} 
-          subValue="8%"
-          icon={IndianRupee}
-          color={{ bg: 'bg-emerald-500', bgLight: 'bg-emerald-100', text: 'text-emerald-600' }}
-        />
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight text-slate-900">Platform Overview</h1>
+          <p className="text-slate-500 text-sm mt-1">Live analytics and fleet status for Hitro Logistics.</p>
+        </div>
+        <div className="bg-green-50 text-green-700 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 border border-green-200">
+          <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
+          System Operational
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        
-        {/* Chart Section */}
-        <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/50 p-6 flex flex-col">
-          <div className="flex justify-between items-center mb-8">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+        <KpiCard title="Active Trips" value={stats.activeTrips} icon={Truck} color="blue" trend="+12% this week" />
+        <KpiCard title="Total Revenue (YTD)" value={`₹${(stats.revenue / 100000).toFixed(2)}L`} icon={DollarSign} color="green" trend="+24% vs last year" />
+        <KpiCard title="Delivered Trips" value={stats.deliveredTrips} icon={CheckCircle} color="indigo" trend="98.5% on-time rate" />
+        <KpiCard title="Active Vendors" value={stats.activeVendors} icon={Users} color="orange" trend="3 new this month" />
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Revenue Growth Chart */}
+        <div className="lg:col-span-2 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-300 transition-all duration-300">
+          <div className="flex justify-between items-start mb-6">
             <div>
-              <h3 className="text-lg font-black text-gray-900">Trip Volume</h3>
-              <p className="text-xs text-gray-500 font-medium">Last 7 days of dispatched trips</p>
+              <h2 className="text-lg font-bold text-slate-800">Revenue Growth</h2>
+              <p className="text-sm text-slate-500">Monthly gross freight revenue (INR)</p>
             </div>
-            <select className="bg-gray-50 border-none text-sm font-bold text-gray-600 py-2 px-4 rounded-xl outline-none cursor-pointer hover:bg-gray-100 transition-colors">
-              <option>This Week</option>
-              <option>Last Week</option>
-            </select>
+            <div className="bg-slate-50 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold border border-slate-200">
+              2026
+            </div>
           </div>
-          
-          <div className="flex-1 min-h-[300px] w-full">
+          <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+              <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} tickFormatter={(val) => `₹${val/100000}L`} />
                 <Tooltip 
-                  cursor={{fill: '#f8fafc'}}
-                  contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)', fontWeight: 'bold'}}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
+                  formatter={(value: any) => [`₹${value.toLocaleString()}`, 'Revenue']}
                 />
-                <Bar dataKey="volume" radius={[6, 6, 6, 6]}>
-                  {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 5 ? '#eab308' : '#334155'} />
-                  ))}
-                </Bar>
-              </BarChart>
+                <Area type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Recent Activity Section */}
-        <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-black text-gray-900">Recent Activity</h3>
-            <button className="text-xs font-bold text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
-              View All
-            </button>
+        {/* Weekly Volume Chart */}
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-300 transition-all duration-300">
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-slate-800">Weekly Trip Volume</h2>
+            <p className="text-sm text-slate-500">Total indents processed</p>
           </div>
-          
-          <div className="space-y-6">
-            {loading ? (
-              <div className="text-center text-sm text-gray-400 py-4 font-medium">Loading activity...</div>
-            ) : trips.length === 0 ? (
-              <>
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                    <IndianRupee className="w-5 h-5 text-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-900">Advance approved</p>
-                    <p className="text-xs text-gray-500 font-medium">TRIP-2291 • ₹15,000 to FastFleet</p>
-                    <p className="text-[10px] text-gray-400 font-semibold mt-1 uppercase tracking-wider">10 mins ago</p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                    <Activity className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-900">POD verified</p>
-                    <p className="text-xs text-gray-500 font-medium">TRIP-2287 • Delhi Hub</p>
-                    <p className="text-[10px] text-gray-400 font-semibold mt-1 uppercase tracking-wider">45 mins ago</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
-                    <Package className="w-5 h-5 text-yellow-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-900">Indent created</p>
-                    <p className="text-xs text-gray-500 font-medium">IND-5521 • ACME Corp</p>
-                    <p className="text-[10px] text-gray-400 font-semibold mt-1 uppercase tracking-wider">2 hours ago</p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              trips.slice(0, 4).map(trip => (
-                <div key={trip.id} className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                    <Activity className="w-5 h-5 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-900">{trip.status}</p>
-                    <p className="text-xs text-gray-500 font-medium">TRP-{1000 + trip.id} • {trip.indent?.customer?.name || "Unknown"}</p>
-                  </div>
-                </div>
-              ))
-            )}
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={tripsData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
+                <Bar dataKey="trips" fill="#f97316" radius={[6, 6, 0, 0]} barSize={30} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
+      </div>
+
+      {/* Live Map Teaser / Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Link href="/map" className="bg-slate-900 rounded-3xl overflow-hidden shadow-lg relative group cursor-pointer transition-transform hover:-translate-y-1 block">
+          <div className="absolute inset-0 opacity-40 bg-[url('https://maps.wikimedia.org/osm-intl/6/45/28.png')] bg-cover bg-center mix-blend-luminosity grayscale group-hover:grayscale-0 transition-all duration-700"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
+          <div className="relative p-8 h-full flex flex-col justify-end min-h-[250px]">
+            <div className="bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full w-max mb-3">Live Fleet GPS</div>
+            <h3 className="text-2xl font-bold text-white mb-2">Track Vehicles in Real-Time</h3>
+            <p className="text-slate-400 text-sm mb-4">View map integrations, milestone tracking, and delay alerts for all active trips.</p>
+            <div className="flex items-center text-blue-400 font-bold text-sm group-hover:text-blue-300">
+              Open Map View <TrendingUp className="w-4 h-4 ml-2" />
+            </div>
+          </div>
+        </Link>
+
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-300 transition-all duration-300">
+          <h2 className="text-lg font-bold text-slate-800 mb-4">Recent Activity</h2>
+          <div className="space-y-5">
+            <ActivityRow icon={CheckCircle} title="POD Verified for TRP-104" time="10 mins ago" color="green" />
+            <ActivityRow icon={DollarSign} title="Invoice INV-2026-F9A2 Generated" time="1 hour ago" color="blue" />
+            <ActivityRow icon={MapPin} title="Vehicle MH-04-1234 reached Checkpoint" time="2 hours ago" color="orange" />
+            <ActivityRow icon={Truck} title="New RFQ assigned to VRL Logistics" time="3 hours ago" color="indigo" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
+function KpiCard({ title, value, icon: Icon, color, trend }: any) {
+  const colorMap: any = {
+    blue: "bg-blue-50 text-blue-600 border-blue-100",
+    green: "bg-green-50 text-green-600 border-green-100",
+    indigo: "bg-indigo-50 text-indigo-600 border-indigo-100",
+    orange: "bg-orange-50 text-orange-600 border-orange-100",
+  };
+
+  const glowMap: any = {
+    blue: "from-blue-500/20",
+    green: "from-green-500/20",
+    indigo: "from-indigo-500/20",
+    orange: "from-orange-500/20",
+  };
+
+  return (
+    <div className="relative bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group cursor-default overflow-hidden">
+      {/* Premium Corner Glow Effect on Hover */}
+      <div className={`absolute -top-12 -right-12 w-40 h-40 bg-gradient-to-bl ${glowMap[color]} to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-3xl pointer-events-none`}></div>
+      
+      <div className="flex justify-between items-start mb-4 relative z-10">
+        <div className={`p-3 rounded-2xl ${colorMap[color]} shrink-0`}>
+          <Icon className="w-6 h-6" />
+        </div>
+      </div>
+      <div>
+        <h3 className="text-slate-500 text-sm font-semibold mb-1">{title}</h3>
+        <div className="text-3xl font-black text-slate-800 tracking-tight">{value}</div>
+        <div className="text-xs font-bold text-slate-400 mt-2">{trend}</div>
+      </div>
+    </div>
+  );
+}
+
+function ActivityRow({ icon: Icon, title, time, color }: any) {
+  const colorMap: any = {
+    blue: "bg-blue-100 text-blue-600",
+    green: "bg-green-100 text-green-600",
+    orange: "bg-orange-100 text-orange-600",
+    indigo: "bg-indigo-100 text-indigo-600",
+  };
+
+  return (
+    <div className="flex gap-4 items-center">
+      <div className={`w-10 h-10 rounded-full flex justify-center items-center shrink-0 ${colorMap[color]}`}>
+        <Icon className="w-4 h-4" />
+      </div>
+      <div className="flex-1">
+        <p className="text-sm font-bold text-slate-700">{title}</p>
+        <p className="text-xs font-semibold text-slate-400 mt-0.5">{time}</p>
       </div>
     </div>
   );

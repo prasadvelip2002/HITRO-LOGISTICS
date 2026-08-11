@@ -1,5 +1,12 @@
 # TMS Functional Requirements (BRD)
 
+## COMPANY PROFILE & BUSINESS CONTEXT
+─────────────────────────────────────
+* **Business Model:** Third-Party Logistics (3PL) & Warehousing.
+* **Asset Mix:** 20 Owned Vehicles + Vendor Fleet (hired as needed for excess demand).
+* **Customer Base:** 64 Permanent Customers, including major OEMs (Hyundai, KIA).
+* **Core Workflows:** Direct dispatch as well as Hub-and-Spoke (Warehouse-routed) operations.
+
 ## 1. CUSTOMER MANAGEMENT
 ─────────────────────────────────────
 Customer Login -> Raise Transport Indent -> Admin Review -> [Reject / Approve] -> Notify / Start Procurement
@@ -16,9 +23,14 @@ Customer receives SQ -> Approve / Reject -> [Reject: Close / Approve: Customer P
 ─────────────────────────────────────
 Confirm Vehicle with Supplier -> Vehicle Assigned -> Driver Assigned -> Supervisor Assigned
 
-## 5. LOADING PROCESS
+## 5. LOADING PROCESS & LR GENERATION
 ─────────────────────────────────────
 Truck reaches Pickup -> Supervisor verifies Truck -> Material Loading -> Generate LR (Lorry Receipt) -> Generate Unique Tracking Number -> Duplicate Number Validation -> Create Digital Consignment -> Generate PDF (Terms & Conditions) -> Print Hard Copy
+
+* **Direct Dispatch:** Single LR is generated from Source to Destination.
+* **Hub-and-Spoke / OEM Model (e.g., Hyundai, KIA):** 
+  * **Leg 1 (Inbound):** Customer -> Hitro Warehouse (Generates **Inbound LR 1**).
+  * **Leg 2 (Outbound):** Hitro Warehouse -> OEM Plant (Generates **Outbound LR 2**).
 
 ## 6. PAYMENT PROCESS
 ─────────────────────────────────────
@@ -30,7 +42,7 @@ Trip Starts -> GPS Tracking -> Geo Tagging -> ETA Calculation -> Live Route -> M
 
 ## 8. DELIVERY
 ─────────────────────────────────────
-Vehicle reaches Destination -> Unload -> Capture (POD, Customer Signature, Customer Seal, ADITI TRANS Seal) -> Upload Documents -> Delivery Completed
+Vehicle reaches Destination -> Unload -> Capture (POD, Customer Signature, Customer Seal, HITRO LOGISTICS Seal) -> Upload Documents -> Delivery Completed
 
 ## 9. POD RETURN PROCESS
 ─────────────────────────────────────

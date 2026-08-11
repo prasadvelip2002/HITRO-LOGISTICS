@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getIndents, getTrips } from "@/lib/api";
+import { getIndents, getTrips, fetchApi } from "@/lib/api";
 import { Panel, ProtoTable, Td, ProtoButton, Badge, RouteTrack } from "@/components/PrototypeUI";
 import { IndentForm } from "@/components/IndentForm";
 import { TripAssignmentForm } from "@/components/TripAssignmentForm";
+import { MapPin } from "lucide-react";
+import Link from "next/link";
 
 function Modal({ isOpen, onClose, title, children }: any) {
   if (!isOpen) return null;
@@ -55,6 +57,23 @@ export default function TripsPage() {
     return map[status] ?? 'grey';
   };
 
+  const handleCreateOutboundLeg = async (tripId: number) => {
+    if (!confirm("Generate Outbound Leg 2 (Warehouse -> OEM) for this Trip?")) return;
+    try {
+      await fetchApi(`/Trips/${tripId}/create-outbound-leg`, { method: "POST" });
+      loadData();
+    } catch (e) {
+      console.error(e);
+      alert("Failed to create outbound leg");
+    }
+  };
+
+  const getLegBadge = (legType: string) => {
+    if (legType === "InboundLeg1") return <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md text-[10px] font-bold uppercase tracking-wider ml-2">Leg 1 (WHS)</span>;
+    if (legType === "OutboundLeg2") return <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-md text-[10px] font-bold uppercase tracking-wider ml-2">Leg 2 (OEM)</span>;
+    return null;
+  };
+
   return (
     <div>
       <div className="flex gap-4 mb-6">
@@ -101,20 +120,49 @@ export default function TripsPage() {
 
       {activeTab === 'trips' && (
         <Panel title="Active Trips" hint="Currently assigned and running">
-          <ProtoTable headers={["Trip ID", "Route", "Vehicle", "Driver", "Progress", "Status"]}>
+          <ProtoTable headers={["Trip ID", "Route", "Vehicle", "Driver", "Progress", "Status", "Actions"]}>
             {trips.length === 0 ? (
-              <tr><Td className="text-center text-muted-text"><span className="col-span-6 block py-4">No active trips.</span></Td></tr>
+              <tr><Td className="text-center text-muted-text"><span className="col-span-7 block py-4">No active trips.</span></Td></tr>
             ) : (
               trips.map(trip => (
                 <tr key={trip.id} className="hover:bg-slate-50 transition-colors">
-                  <Td className="font-mono">TRP-{trip.id}</Td>
+                  <Td className="font-mono">
+                    TRP-{trip.id}
+                    {getLegBadge(trip.legType)}
+                  </Td>
                   <Td>{trip.indent?.source} &rarr; {trip.indent?.destination}</Td>
-                  <Td>{trip.vehicle?.registrationNumber}</Td>
-                  <Td>{trip.driver?.name}</Td>
+                  <Td>{trip.vehicle?.vehicleNumber || "—"}</Td>
+                  <Td>{trip.driver?.name || "—"}</Td>
                   <Td className="w-[200px]">
                     <RouteTrack stages={TRIP_STAGES} currentIdx={getStageIdx(trip.status)} />
                   </Td>
                   <Td><Badge color={getBadgeColor(trip.status)}>{trip.status}</Badge></Td>
+                  <Td className="flex gap-2 items-center">
+                    {(!trip.legType || trip.legType === "Direct") && (
+                      <button 
+                        onClick={() => handleCreateOutboundLeg(trip.id)}
+                        className="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-lg text-[11.5px] font-bold uppercase tracking-wide transition-colors"
+                      >
+                        + Forward to OEM
+                      </button>
+                    )}
+                    {trip.legType === "OutboundLeg2" && (
+                      <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">From TRP-{trip.parentTripId}</span>
+                    )}
+                    <Link href={`/trips/${trip.id}/tracking`}>
+                      <button className="bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 px-3 py-1.5 rounded-lg text-[11.5px] font-bold uppercase tracking-wide transition-colors">
+                        <MapPin className="w-3.5 h-3.5" />
+                      </button>
+                    </Link>
+                    <a 
+                      href={`/trips/${trip.id}/lr`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-[11.5px] font-bold uppercase tracking-wide transition-colors ml-2"
+                    >
+                      Print LR
+                    </a>
+                  </Td>
                 </tr>
               ))
             )}

@@ -25,7 +25,7 @@ export function Header() {
   };
 
   return (
-    <div className="h-[100px] shrink-0 bg-white border-b border-slate-200/80 flex items-center justify-between px-8 relative z-50">
+    <div className="h-[90px] shrink-0 bg-white/70 backdrop-blur-xl border-b border-slate-200/50 shadow-[0_4px_30px_rgb(0,0,0,0.03)] flex items-center justify-between px-10 relative z-50">
       <div className="flex flex-col">
         <div className="font-bold text-[18px] text-slate-800 leading-tight">Dashboard</div>
         <div className="font-medium text-[12.5px] text-slate-500 mt-0.5 tracking-wide">Overview across all active trips</div>
@@ -41,8 +41,8 @@ export function Header() {
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-3 hover:bg-slate-50 p-1.5 pr-4 rounded-full transition-all duration-200 border border-transparent hover:border-slate-200/80 hover:shadow-sm"
           >
-            <div className="w-[34px] h-[34px] bg-gradient-to-br from-yellow-400 to-yellow-600 text-white rounded-full flex items-center justify-center font-bold text-[14px] shadow-inner">
-              {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
+            <div className="w-[34px] h-[34px] bg-[#1E3A8A] text-white rounded-full flex items-center justify-center font-bold text-[14px] shadow-inner">
+              {user?.name ? user.name.charAt(0).toUpperCase() : 'PV'}
             </div>
             <div className="text-left hidden sm:block">
               <div className="text-[13px] font-semibold text-slate-700 leading-none">{user?.name || "Admin"}</div>
