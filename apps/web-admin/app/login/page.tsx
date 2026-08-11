@@ -30,6 +30,7 @@ export default function LoginPage() {
         const data = await response.json();
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
+        document.cookie = "isLoggedIn=true; path=/; max-age=86400"; // Set cookie for middleware
         toast.success("Login successful!");
         router.push("/");
       } else {
