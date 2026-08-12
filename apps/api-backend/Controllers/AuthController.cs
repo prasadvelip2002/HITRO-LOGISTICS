@@ -35,11 +35,11 @@ namespace api_backend.Controllers
             // Dynamic Driver Login via Phone Number
             if (!string.IsNullOrEmpty(request.Phone))
             {
-                var driver = await _context.Drivers.FirstOrDefaultAsync(d => d.Phone == request.Phone);
+                var driver = await _context.Drivers.IgnoreQueryFilters().FirstOrDefaultAsync(d => d.Phone == request.Phone);
                 if (driver == null) 
                 {
                     // Fallback to the seeded driver if they just type anything for demo purposes
-                    driver = await _context.Drivers.FirstOrDefaultAsync();
+                    driver = await _context.Drivers.IgnoreQueryFilters().FirstOrDefaultAsync();
                     if (driver == null) return Unauthorized(new { message = "No drivers exist in system." });
                 }
 
