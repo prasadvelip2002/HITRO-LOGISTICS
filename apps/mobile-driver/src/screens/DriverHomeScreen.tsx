@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, SafeAreaView, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, SafeAreaView, Alert, RefreshControl } from 'react-native';
 import { cacheTrips, getCachedTrips } from '../lib/database';
 import { useSync } from '../hooks/useSync';
 
@@ -8,6 +8,7 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:5063/api';
 export default function DriverHomeScreen({ authState, onSelectTrip, onNavigate }: { authState: any, onSelectTrip: (trip: any) => void, onNavigate: (screen: string) => void }) {
   const [trips, setTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const { isOnline, isSyncing } = useSync(authState);
 
   useEffect(() => {
@@ -50,8 +51,14 @@ export default function DriverHomeScreen({ authState, onSelectTrip, onNavigate }
       }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchTrips();
+  }, [authState]);
 
   const renderTrip = useCallback(({ item }: { item: any }) => {
     const isNew = item.status === 'Assigned' || item.status === 'Draft';
@@ -147,6 +154,13 @@ export default function DriverHomeScreen({ authState, onSelectTrip, onNavigate }
           renderItem={renderTrip}
           contentContainerStyle={styles.list}
           style={styles.flatList}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#1d4ed8']}
+            />
+          }
         />
       )}
 
