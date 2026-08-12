@@ -29,7 +29,7 @@ export default function LoginScreen({ onLogin }: { onLogin: (user: any) => void 
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'driver1@example.com', password: 'password123' }),
+        body: JSON.stringify({ phone: phone, password: 'otp' }),
       });
 
       if (response.ok) {

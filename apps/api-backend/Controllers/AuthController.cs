@@ -24,18 +24,27 @@ namespace api_backend.Controllers
 
         public class LoginRequest
         {
-            public required string Email { get; set; }
-            public required string Password { get; set; }
+            public string? Email { get; set; }
+            public string? Phone { get; set; }
+            public string? Password { get; set; }
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            // Demo backdoor for the mobile app presentation
-            if (request.Email == "driver1@example.com")
+            // Dynamic Driver Login via Phone Number
+            if (!string.IsNullOrEmpty(request.Phone))
             {
-                var demoTenantId = await _context.Tenants.Select(t => t.Id).FirstOrDefaultAsync();
-                var demoUserId = 999;
+                var driver = await _context.Drivers.FirstOrDefaultAsync(d => d.Phone == request.Phone);
+                if (driver == null) 
+                {
+                    // Fallback to the seeded driver if they just type anything for demo purposes
+                    driver = await _context.Drivers.FirstOrDefaultAsync();
+                    if (driver == null) return Unauthorized(new { message = "No drivers exist in system." });
+                }
+
+                var demoTenantId = driver.TenantId;
+                var demoUserId = driver.Id;
                 
                 var demoKey = _configuration["Jwt:Key"] ?? "SuperSecretKeyForTransportManagementSystem!123";
                 var demoSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(demoKey));
@@ -44,7 +53,7 @@ namespace api_backend.Controllers
                 var demoClaims = new[]
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, demoUserId.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, request.Email),
+                    new Claim("Phone", driver.Phone),
                     new Claim("TenantId", demoTenantId.ToString()),
                     new Claim(ClaimTypes.Role, "Driver")
                 };
@@ -59,7 +68,7 @@ namespace api_backend.Controllers
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(demoToken),
-                    user = new { Id = demoUserId, Name = "Demo Driver", Email = request.Email, Role = "Driver", TenantId = demoTenantId }
+                    user = new { Id = demoUserId, Name = driver.Name, Phone = driver.Phone, Role = "Driver", TenantId = demoTenantId }
                 });
             }
 
