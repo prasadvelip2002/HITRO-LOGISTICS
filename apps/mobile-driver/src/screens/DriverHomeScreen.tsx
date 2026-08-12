@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, SafeAreaView, Alert } from 'react-native';
 import { cacheTrips, getCachedTrips } from '../lib/database';
 import { useSync } from '../hooks/useSync';
@@ -53,7 +53,7 @@ export default function DriverHomeScreen({ authState, onSelectTrip, onNavigate }
     }
   };
 
-  const renderTrip = ({ item }: { item: any }) => {
+  const renderTrip = useCallback(({ item }: { item: any }) => {
     const isNew = item.status === 'Assigned' || item.status === 'Draft';
     
     // Safely extract source/destination from trip -> indent, or fallback
@@ -102,7 +102,7 @@ export default function DriverHomeScreen({ authState, onSelectTrip, onNavigate }
         </View>
       </TouchableOpacity>
     );
-  };
+  }, [onSelectTrip]);
 
   return (
     <SafeAreaView style={styles.container}>
