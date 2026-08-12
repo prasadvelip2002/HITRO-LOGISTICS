@@ -159,12 +159,12 @@ export default function AdminPODDashboard() {
                 <div key={doc.id} className="border border-slate-200 rounded-xl overflow-hidden group">
                   <div className="bg-slate-100 flex items-center justify-center p-2 relative h-[300px]">
                     <img 
-                      src={`http://localhost:5000${doc.fileUrl}`} 
+                      src={`https://hitro-logistics.onrender.com${doc.fileUrl}`} 
                       alt="POD Document" 
                       className="max-h-full max-w-full object-contain drop-shadow-md rounded"
                     />
                     <a 
-                      href={`http://localhost:5000${doc.fileUrl}`} 
+                      href={`https://hitro-logistics.onrender.com${doc.fileUrl}`} 
                       target="_blank"
                       className="absolute top-3 right-3 bg-white/90 backdrop-blur p-2 rounded-lg shadow-sm text-slate-600 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
