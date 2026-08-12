@@ -22,7 +22,7 @@ export default function TripDetailsScreen({ trip, authState, onBack, onNavigate 
 
       if (isOnline) {
         const response = await fetch(`${API_URL}/Trips/${trip.id}/status`, {
-          method: 'PUT',
+          method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${authState.token}` 
@@ -41,7 +41,7 @@ export default function TripDetailsScreen({ trip, authState, onBack, onNavigate 
       }
     } catch (error) {
       console.log('Falling back to offline sync queue', error);
-      await addToSyncQueue(`/Trips/${trip.id}/status`, 'PUT', { status: newStatus });
+      await addToSyncQueue(`/Trips/${trip.id}/status`, 'POST', { status: newStatus });
       await updateCachedTripStatus(trip.id, newStatus);
       setCurrentStatus(newStatus);
       Alert.alert('Saved Offline', `Your status update to "${newStatus}" has been saved locally and will sync when you are online.`);
